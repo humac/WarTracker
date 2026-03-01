@@ -1,69 +1,60 @@
-# WarTracker
+# WarTracker 🌍
 
-Real-time global conflict tracking and analysis platform
+**Real-time Global Conflict Tracking & Analysis Platform**
+
+## Mission
+
+WarTracker searches the internet continuously to provide users with **real-time, verified information on conflicts around the world**. Our goal is to cut through noise and deliver accurate, actionable intelligence on global conflicts, humanitarian crises, and geopolitical tensions.
+
+## Core Features
+
+- 🔍 **Real-time Monitoring** - Continuous web scraping and API integration for live conflict data
+- 🗺️ **Interactive Map** - Visual representation of global conflicts with severity indicators
+- 📊 **Trend Analysis** - AI-powered pattern detection and escalation warnings
+- 📰 **Source Verification** - Multi-source cross-referencing to combat misinformation
+- 🔔 **Alerts** - Customizable notifications for specific regions or conflict types
+- 📈 **Historical Data** - Track conflict evolution over time with analytics
 
 ## Tech Stack
-Next.js 16 + FastAPI + PostgreSQL
+
+- **Frontend:** Next.js 16, TypeScript, Tailwind CSS, MapLibre/Leaflet
+- **Backend:** FastAPI, Python, PostgreSQL, Redis (caching)
+- **AI/ML:** Ollama Cloud models (analysis, summarization, trend detection)
+- **Data Sources:** News APIs, social media, government reports, NGO feeds
+- **Infrastructure:** Docker, PostgreSQL with PostGIS (geospatial queries)
+
+## Status
+
+🚧 **Phase:** Requirements Gathering (Pepper)  
+📋 **Next:** Architecture Design (Tony) → Implementation (Peter) → QA (Heimdall)
 
 ## Quick Start
 
-### Prerequisites
-- Node.js 18+
-- npm or yarn
-
-### Installation
-
 ```bash
-# Install dependencies
-npm install
+# Clone the repository
+git clone https://github.com/humac/WarTracker.git
+cd WarTracker
 
-# Copy environment example
-cp .env.example .env.local
+# Install dependencies (after setup)
+cd frontend && npm install
+cd ../backend && pip install -r requirements.txt
 
-# Edit .env.local with your configuration
-```
-
-### Development
-
-```bash
-# Start dev server
-npm run dev
-
-# Build for production
-npm run build
-
-# Start production server
-npm start
-
-# Run tests
-npm test
+# Start development servers
+# (Detailed instructions in ADMIN_GUIDE.md)
 ```
 
 ## Project Structure
 
 ```
 WarTracker/
-├── src/                 # Application source code
-│   ├── app/            # Next.js App Router pages & API routes
-│   ├── components/     # React components
-│   ├── lib/           # Utilities, hooks, types
-│   └── styles/        # Global styles
-├── docs/              # Project documentation
+├── frontend/            # Next.js frontend application
+├── backend/             # FastAPI backend + data collectors
+├── docs/                # Project documentation
 │   ├── agent-workflow/  # Agent pipeline docs
-│   │   ├── REQ.md      # Requirements
-│   │   ├── ARCH.md     # Architecture
-│   │   ├── TASKS.md    # Implementation tasks
-│   │   ├── QA.md       # QA criteria
-│   │   ├── CLAUDE.md   # Claude instructions
-│   │   ├── GEMINI.md   # Gemini instructions
-│   │   └── ISSUES.md   # Issues log
 │   ├── DECISIONS.md     # Architecture decisions
 │   └── RUN_STATE.md     # Pipeline state
-├── public/            # Static assets
-├── .env.example       # Environment template
-├── .env.local         # Local environment (gitignored)
-├── package.json       # Dependencies
-└── README.md          # This file
+├── agents/              # Agent personas (tony, peter, heimdall, pepper)
+└── README.md            # This file
 ```
 
 ## Development Workflow
@@ -80,8 +71,13 @@ Agent workflow documents are in `docs/agent-workflow/`.
 
 ## Links
 
-- [GitHub Repository](https://github.com/humac/WarTracker)
-- [Requirements](docs/agent-workflow/REQ.md)
-- [Architecture](docs/agent-workflow/ARCH.md)
-- [Tasks](docs/agent-workflow/TASKS.md)
-- [QA Plan](docs/agent-workflow/QA.md)
+- **GitHub:** https://github.com/humac/WarTracker
+- **Issues:** https://github.com/humac/WarTracker/issues
+- **Requirements:** docs/agent-workflow/REQ.md
+- **Architecture:** docs/agent-workflow/ARCH.md
+
+---
+
+**Built with ❤️ for global awareness and transparency**
+
+*WarTracker provides information only and does not take political positions. All data is sourced from publicly available information.*
