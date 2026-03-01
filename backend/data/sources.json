@@ -1,0 +1,47 @@
+[
+  {
+    "name": "GDELT Project",
+    "url": "https://www.gdeltproject.org/",
+    "source_type": "api",
+    "credibility_tier": 1,
+    "credibility_score": 0.95,
+    "api_endpoint": "https://api.gdeltproject.org/api/v2/doc/doc",
+    "polling_interval_seconds": 300
+  },
+  {
+    "name": "ACLED",
+    "url": "https://acleddata.com/",
+    "source_type": "api",
+    "credibility_tier": 1,
+    "credibility_score": 0.98,
+    "api_endpoint": "https://api.acleddata.com/api",
+    "polling_interval_seconds": 300
+  },
+  {
+    "name": "NewsAPI",
+    "url": "https://newsapi.org/",
+    "source_type": "api",
+    "credibility_tier": 2,
+    "credibility_score": 0.85,
+    "api_endpoint": "https://newsapi.org/v2",
+    "polling_interval_seconds": 600
+  },
+  {
+    "name": "UN OCHA ReliefWeb",
+    "url": "https://reliefweb.int/",
+    "source_type": "rss",
+    "credibility_tier": 1,
+    "credibility_score": 0.97,
+    "api_endpoint": "https://reliefweb.int/api",
+    "polling_interval_seconds": 1800
+  },
+  {
+    "name": "US State Department Travel Advisories",
+    "url": "https://travel.state.gov/",
+    "source_type": "rss",
+    "credibility_tier": 1,
+    "credibility_score": 0.92,
+    "api_endpoint": "https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories.xml",
+    "polling_interval_seconds": 3600
+  }
+]
