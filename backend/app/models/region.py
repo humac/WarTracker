@@ -1,5 +1,4 @@
 from sqlalchemy import Column, BigInteger, String, ForeignKey, DateTime
-from sqlalchemy.dialects.postgresql import JSONB
 from geoalchemy2 import Geometry
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func

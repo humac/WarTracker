@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
+from app.rate_limiter import limiter
 from sqlalchemy.orm import Session
 from typing import List
 from app.database import get_db
@@ -12,7 +13,8 @@ router = APIRouter()
 
 
 @router.get("")
-async def list_sources(db: Session = Depends(get_db)):
+@limiter.limit("100/minute")
+async def list_sources(request: Request, db: Session = Depends(get_db)):
     """List all configured data sources with status."""
     try:
         sources = db.query(Source).all()
@@ -27,7 +29,8 @@ async def list_sources(db: Session = Depends(get_db)):
 
 
 @router.get("/{source_id}")
-async def get_source(source_id: str, db: Session = Depends(get_db)):
+@limiter.limit("100/minute")
+async def get_source(request: Request, source_id: str, db: Session = Depends(get_db)):
     """Get details for a specific data source."""
     try:
         source = db.query(Source).filter(Source.id == source_id).first()

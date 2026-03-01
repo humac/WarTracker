@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from app.rate_limiter import limiter
 from sqlalchemy.orm import Session
 from sqlalchemy import text, func
 from typing import List, Optional, Dict, Any
@@ -13,7 +14,9 @@ router = APIRouter()
 
 
 @router.get("")
+@limiter.limit("100/minute")
 async def list_events(
+    request: Request,
     lat: Optional[float] = Query(None, description="Latitude for geospatial query"),
     lon: Optional[float] = Query(None, description="Longitude for geospatial query"),
     radius: Optional[float] = Query(50, description="Radius in kilometers"),
@@ -48,16 +51,16 @@ async def list_events(
         
         # Date range filters
         if date_from is not None:
-            query = query.filter(ConflictEvent.published_date >= date_from)
+            query = query.filter(ConflictEvent.event_timestamp >= date_from)
         if date_to is not None:
-            query = query.filter(ConflictEvent.published_date <= date_to)
+            query = query.filter(ConflictEvent.event_timestamp <= date_to)
         
         # Source filter
         if source is not None:
             query = query.filter(ConflictEvent.source_id == source)
         
         # Order by most recent first
-        query = query.order_by(ConflictEvent.published_date.desc())
+        query = query.order_by(ConflictEvent.event_timestamp.desc())
         
         # Pagination
         events = query.offset(skip).limit(limit).all()
@@ -74,7 +77,8 @@ async def list_events(
 
 
 @router.get("/{event_id}")
-async def get_event(event_id: int, db: Session = Depends(get_db)):
+@limiter.limit("100/minute")
+async def get_event(request: Request, event_id: int, db: Session = Depends(get_db)):
     """Get detailed information about a specific conflict event."""
     try:
         event = db.query(ConflictEvent).filter(ConflictEvent.id == event_id).first()
@@ -91,7 +95,9 @@ async def get_event(event_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/stats")
+@limiter.limit("100/minute")
 async def get_stats(
+    request: Request,
     date_from: Optional[datetime] = Query(None, description="Start date for statistics"),
     date_to: Optional[datetime] = Query(None, description="End date for statistics"),
     db: Session = Depends(get_db)
@@ -108,9 +114,9 @@ async def get_stats(
         # Base query with optional date filters
         base_query = db.query(ConflictEvent)
         if date_from:
-            base_query = base_query.filter(ConflictEvent.published_date >= date_from)
+            base_query = base_query.filter(ConflictEvent.event_timestamp >= date_from)
         if date_to:
-            base_query = base_query.filter(ConflictEvent.published_date <= date_to)
+            base_query = base_query.filter(ConflictEvent.event_timestamp <= date_to)
         
         # Total events
         total_events = base_query.count()
@@ -135,10 +141,10 @@ async def get_stats(
         
         # Timeline (events per day)
         timeline_stats = db.query(
-            func.date(ConflictEvent.published_date).label('date'),
+            func.date(ConflictEvent.event_timestamp).label('date'),
             func.count(ConflictEvent.id).label('count')
-        ).group_by(func.date(ConflictEvent.published_date)).order_by(
-            func.date(ConflictEvent.published_date)
+        ).group_by(func.date(ConflictEvent.event_timestamp)).order_by(
+            func.date(ConflictEvent.event_timestamp)
         ).all()
         timeline = {
             str(t.date): t.count for t in timeline_stats

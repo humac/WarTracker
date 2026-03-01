@@ -3,8 +3,19 @@
 import pytest
 from datetime import datetime
 from app.models import ConflictEvent, Source, User, Verification, Alert
+from sqlalchemy import inspect
+
+# Skip geometry-dependent tests when using SQLite
+import os
+TEST_DB_URL = os.getenv("TEST_DATABASE_URL", "")
+USE_SQLITE = not TEST_DB_URL or TEST_DB_URL.startswith("sqlite")
+
+def requires_postgis(test_func):
+    """Decorator to skip tests that require PostGIS/PostgreSQL."""
+    return pytest.mark.skipif(USE_SQLITE, reason="Requires PostgreSQL with PostGIS")(test_func)
 
 
+@requires_postgis
 def test_create_source(db_session):
     """Test creating a source."""
     source = Source(
@@ -24,6 +35,7 @@ def test_create_source(db_session):
     assert source.credibility_tier == 2
 
 
+@requires_postgis
 def test_create_conflict_event(db_session):
     """Test creating a conflict event."""
     event = ConflictEvent(
@@ -68,6 +80,7 @@ def test_create_user(db_session):
     assert user.is_active is True
 
 
+@requires_postgis
 def test_severity_constraint(db_session):
     """Test severity score constraint (1-5)."""
     # Valid severity
@@ -82,6 +95,7 @@ def test_severity_constraint(db_session):
     assert event.severity_score == 5
 
 
+@requires_postgis
 def test_verification_relationship(db_session):
     """Test verification relationship with event and source."""
     # Create source

@@ -1,5 +1,4 @@
-from sqlalchemy import Column, BigInteger, String, Integer, Boolean, DateTime, ForeignKey, CheckConstraint
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import Column, BigInteger, String, Integer, Boolean, DateTime, ForeignKey, CheckConstraint, JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from ..database import Base
@@ -9,11 +8,11 @@ class Alert(Base):
     __tablename__ = "alerts"
     
     id = Column(BigInteger, primary_key=True, index=True)
-    user_id = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     conflict_event_id = Column(BigInteger, ForeignKey("conflict_events.id"), index=True)
     name = Column(String(200))
-    region_filter = Column(JSONB)  # {country_codes: [...], region_names: [...]}
-    conflict_type_filter = Column(JSONB)  # Array of event types
+    region_filter = Column(JSON)  # {country_codes: [...], region_names: [...]}
+    conflict_type_filter = Column(JSON)  # Array of event types
     severity_threshold = Column(Integer, default=3)  # 1-5
     notification_method = Column(String(20), default='push')  # push|email|rss
     is_active = Column(Boolean, default=True, index=True)

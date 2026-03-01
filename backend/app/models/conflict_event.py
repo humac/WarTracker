@@ -1,5 +1,4 @@
-from sqlalchemy import Column, BigInteger, String, Text, Integer, Float, Boolean, DateTime, CheckConstraint, ForeignKey
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import Column, BigInteger, String, Text, Integer, Float, Boolean, DateTime, CheckConstraint, ForeignKey, JSON
 from geoalchemy2 import Geometry
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -24,7 +23,7 @@ class ConflictEvent(Base):
     verification_status = Column(String(20), default='unverified', index=True)  # unverified|verified|disputed
     confidence_score = Column(Float)
     is_active = Column(Boolean, default=True, index=True)
-    actors_involved = Column(JSONB, default=list)
+    actors_involved = Column(JSON, default=list)
     country_code = Column(String(2), index=True)
     region_name = Column(String(200), index=True)
     ai_summary = Column(Text)

@@ -1,5 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from .rate_limiter import limiter
 from .config import settings
 from .database import engine, Base
 import structlog
@@ -29,6 +32,10 @@ app = FastAPI(
     version=settings.APP_VERSION,
     description="Real-time global conflict tracking and analysis platform"
 )
+
+# Rate limiting
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS
 app.add_middleware(
@@ -70,11 +77,6 @@ async def root():
     }
 
 
-# Import and include API routers (will be added as we implement them)
-# from .api.v1 import events, sources, alerts, users, regions, export
-# app.include_router(events.router, prefix="/api/v1", tags=["events"])
-# app.include_router(sources.router, prefix="/api/v1", tags=["sources"])
-# app.include_router(alerts.router, prefix="/api/v1", tags=["alerts"])
-# app.include_router(users.router, prefix="/api/v1", tags=["users"])
-# app.include_router(regions.router, prefix="/api/v1", tags=["regions"])
-# app.include_router(export.router, prefix="/api/v1", tags=["export"])
+# Import and include API routers
+from .api.v1 import api_router
+app.include_router(api_router, prefix="/api/v1")

@@ -1,5 +1,4 @@
-from sqlalchemy import Column, BigInteger, String, Boolean, Time, DateTime, ForeignKey
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import Column, BigInteger, Integer, String, Boolean, Time, DateTime, ForeignKey, JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from ..database import Base
@@ -9,9 +8,9 @@ class UserPreference(Base):
     __tablename__ = "user_preferences"
     
     id = Column(BigInteger, primary_key=True, index=True)
-    user_id = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False)
     theme = Column(String(20), default='light')  # light|dark
-    default_map_view = Column(JSONB)  # {lat, lng, zoom}
+    default_map_view = Column(JSON)  # {lat, lng, zoom}
     export_format = Column(String(10), default='json')  # csv|json
     email_notifications = Column(Boolean, default=True)
     push_notifications = Column(Boolean, default=True)

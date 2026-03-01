@@ -1,6 +1,7 @@
 from pydantic_settings import BaseSettings
 from functools import lru_cache
 from typing import Optional
+import os
 
 
 class Settings(BaseSettings):
@@ -10,7 +11,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     
     # Database
-    DATABASE_URL: str = "postgresql://postgres:wartracker_password_change_in_production@localhost/wartracker"
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://wartracker:changeme@localhost:5432/wartracker")
     
     # Redis
     REDIS_URL: str = "redis://localhost:6379"

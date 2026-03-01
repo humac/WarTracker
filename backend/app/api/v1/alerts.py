@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
+from app.rate_limiter import limiter
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime
@@ -12,7 +13,9 @@ router = APIRouter()
 
 
 @router.get("")
+@limiter.limit("100/minute")
 async def list_alerts(
+    request: Request,
     skip: int = 0,
     limit: int = 100,
     active_only: bool = True,
@@ -37,7 +40,8 @@ async def list_alerts(
 
 
 @router.get("/{alert_id}")
-async def get_alert(alert_id: int, db: Session = Depends(get_db)):
+@limiter.limit("100/minute")
+async def get_alert(request: Request, alert_id: int, db: Session = Depends(get_db)):
     """Get details for a specific alert."""
     try:
         alert = db.query(Alert).filter(Alert.id == alert_id).first()
