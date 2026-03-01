@@ -1,14 +1,32 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { ConflictMap } from './components/ConflictMap'
+
+interface ConflictEvent {
+  id: number
+  title: string
+  latitude: number
+  longitude: number
+  severity: number
+  published_date: string
+}
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [events, setEvents] = useState<ConflictEvent[]>([])
 
   useEffect(() => {
-    // Simulate loading
+    // Simulate loading and fetch mock data
     const timer = setTimeout(() => {
+      // Mock events for demonstration
+      const mockEvents: ConflictEvent[] = [
+        { id: 1, title: "Conflict in region", latitude: 33.8886, longitude: 35.4955, severity: 4, published_date: "2026-03-01" },
+        { id: 2, title: "Border dispute escalation", latitude: 31.7683, longitude: 35.2137, severity: 3, published_date: "2026-03-01" },
+        { id: 3, title: "Ceasefire violation", latitude: 36.2032, longitude: 37.1598, severity: 5, published_date: "2026-02-28" }
+      ]
+      setEvents(mockEvents)
       setIsLoading(false)
     }, 1000)
 
@@ -68,36 +86,46 @@ export default function Home() {
             </div>
           </div>
         ) : (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-              Welcome to WarTracker
-            </h2>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">
-              Real-time global conflict tracking and analysis platform. Monitor conflicts worldwide with verified, multi-source intelligence.
-            </p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-                <h3 className="text-lg font-semibold text-green-800 dark:text-green-200">Active Conflicts</h3>
-                <p className="text-3xl font-bold text-green-600 dark:text-green-400 mt-2">Loading...</p>
+          <>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                Welcome to WarTracker
+              </h2>
+              <p className="text-gray-600 dark:text-gray-300 mb-6">
+                Real-time global conflict tracking and analysis platform. Monitor conflicts worldwide with verified, multi-source intelligence.
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                  <h3 className="text-lg font-semibold text-green-800 dark:text-green-200">Active Conflicts</h3>
+                  <p className="text-3xl font-bold text-green-600 dark:text-green-400 mt-2">{events.length}</p>
+                </div>
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                  <h3 className="text-lg font-semibold text-yellow-800 dark:text-yellow-200">24h Changes</h3>
+                  <p className="text-3xl font-bold text-yellow-600 dark:text-yellow-400 mt-2">+2</p>
+                </div>
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                  <h3 className="text-lg font-semibold text-red-800 dark:text-red-200">High Severity</h3>
+                  <p className="text-3xl font-bold text-red-600 dark:text-red-400 mt-2">{events.filter(e => e.severity >= 4).length}</p>
+                </div>
               </div>
-              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
-                <h3 className="text-lg font-semibold text-yellow-800 dark:text-yellow-200">24h Changes</h3>
-                <p className="text-3xl font-bold text-yellow-600 dark:text-yellow-400 mt-2">Loading...</p>
-              </div>
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-                <h3 className="text-lg font-semibold text-red-800 dark:text-red-200">High Severity</h3>
-                <p className="text-3xl font-bold text-red-600 dark:text-red-400 mt-2">Loading...</p>
+
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                  ⚠️ Data sourced from multiple providers including GDELT, ACLED, NewsAPI, and UN OCHA. 
+                  All events are cross-referenced for verification. WarTracker maintains strict political neutrality.
+                </p>
               </div>
             </div>
 
-            <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-              <p className="text-sm text-gray-500 dark:text-gray-400 italic">
-                ⚠️ Data sourced from multiple providers including GDELT, ACLED, NewsAPI, and UN OCHA. 
-                All events are cross-referenced for verification. WarTracker maintains strict political neutrality.
-              </p>
+            {/* Interactive Map */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                Conflict Map
+              </h2>
+              <ConflictMap events={events} />
             </div>
-          </div>
+          </>
         )}
       </div>
 
