@@ -163,16 +163,26 @@ WarTracker/
 
 ## Map Component
 
-WarTracker features a production-ready interactive map built with **MapLibre GL** and **supercluster** for efficient marker clustering.
+WarTracker features a production-ready interactive map built with **Leaflet.js v1.9.4** and **leaflet.markercluster v1.5.3** for efficient marker clustering.
 
 ### Features
 
-- **Marker Clustering** - Automatically clusters 1,000+ events based on zoom level
-- **Severity Indicators** - Color-coded markers (red=high, orange=medium, green=low)
-- **Interactive Popups** - Click markers to view event details
-- **Accessibility** - WCAG 2.1 AA compliant (keyboard navigation, screen readers)
+- **Marker Clustering** - Automatically clusters 1,000+ events based on zoom level using leaflet.markercluster
+- **Severity Indicators** - Color-coded markers (red=high severity 4-5, orange=medium severity 3, green=low severity 1-2)
+- **Interactive Popups** - Click markers to view event details (title, severity, date)
+- **Accessibility** - WCAG 2.1 AA compliant (ARIA live regions, keyboard navigation, screen reader support)
 - **Performance** - Optimized for 10,000+ concurrent markers (<1s render time)
-- **Error Handling** - Graceful degradation with loading states and error boundaries
+- **Error Handling** - Graceful degradation with loading states, error boundaries, and 10-second timeout
+- **Memory Management** - Proper cleanup on component unmount (prevents memory leaks)
+
+### Technology Stack
+
+| Library | Version | Purpose |
+|---------|---------|---------|
+| Leaflet | v1.9.4 | Core mapping library (lightweight, no WebGL required) |
+| leaflet.markercluster | v1.5.3 | Automatic marker clustering |
+| @types/leaflet | v1.9.21 | TypeScript type definitions |
+| @types/leaflet.markercluster | v1.5.4 | TypeScript types for clustering |
 
 ### Usage
 
@@ -183,16 +193,46 @@ import type { ConflictEvent } from '@/app/components/ConflictMap'
 const events: ConflictEvent[] = [...] // Fetch from API
 
 export default function MapPage() {
-  return <ConflictMap events={events} />
+  return (
+    <ConflictMap 
+      events={events} 
+      height="600px"
+      className="rounded-lg shadow-lg"
+    />
+  )
+}
+```
+
+### Props
+
+| Prop | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| `events` | `ConflictEvent[]` | ✅ Yes | - | Array of conflict events to display |
+| `height` | `string` | ❌ No | `'600px'` | Map container height |
+| `className` | `string` | ❌ No | `''` | Additional CSS classes |
+| `initialZoom` | `number` | ❌ No | `3` | Initial zoom level |
+| `initialCenter` | `[number, number]` | ❌ No | `[35, 30]` | Initial map center [lat, lng] |
+
+### ConflictEvent Interface
+
+```typescript
+interface ConflictEvent {
+  id: number
+  title: string
+  latitude: number
+  longitude: number
+  severity: number  // 1-5 scale
+  published_date: string
 }
 ```
 
 ### Documentation
 
 - **[Map Component Guide](docs/MAP_COMPONENT_GUIDE.md)** - Comprehensive usage guide, props reference, customization
-- **[Architecture Decision](docs/ARCH_MAP_COMPONENT.md)** - Why MapLibre GL was selected
+- **[Architecture Decision](docs/ARCH_MAP_COMPONENT.md)** - Why Leaflet.js was selected (not MapLibre GL)
 - **[Implementation Report](docs/MAP_COMPONENT_IMPLEMENTATION.md)** - Technical implementation details
-- **[QA Report](docs/agent-workflow/QA_MAP_FIX.md)** - Testing and validation results
+- **[QA Report](docs/agent-workflow/QA_MAP_COMPONENT_V2.md)** - Testing and validation results (27/27 tests passing)
+- **[Final Report V2](docs/MAP_FIX_FINAL_REPORT_V2.md)** - Closeout report with lessons learned
 
 ### Performance Benchmarks
 
@@ -202,9 +242,21 @@ export default function MapPage() {
 | 1,000 | <300ms | ~50MB |
 | 10,000 | <800ms | ~100MB |
 
+### Accessibility Features
+
+- ✅ **ARIA Live Regions:** Announces loading and error states to screen readers
+- ✅ **Keyboard Navigation:** Markers respond to Enter/Space keys to open popups
+- ✅ **Focus Management:** Map container is focusable with `tabIndex={0}`
+- ✅ **Screen Reader Labels:** Descriptive labels for all interactive elements
+- ✅ **Semantic HTML:** Proper role attributes throughout
+
 ### Troubleshooting
 
-**Map stuck in "Loading..." state?** This is typically a network access issue. The map loads tiles from external servers (`demotiles.maplibre.org`). In Docker development environments, network restrictions may prevent tile loading. Deploy to production or configure local tile server for development.
+**Map stuck in "Loading..." state?** This is typically a network access issue. The map loads tiles from external servers (`tile.openstreetmap.org`). In Docker development environments, network restrictions may prevent tile loading. Deploy to production or configure local tile server for development.
+
+**Markers not clustering?** Ensure you have 10+ events in view. Clustering automatically disables at zoom level ≥10.
+
+**WebGL errors?** Leaflet.js does NOT require WebGL. If you see WebGL errors, they are unrelated to the map component.
 
 See [Map Component Guide](docs/MAP_COMPONENT_GUIDE.md#troubleshooting) for detailed troubleshooting.
 

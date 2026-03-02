@@ -1,104 +1,69 @@
 # WarTracker - Run State
 
-**Last Updated:** 2026-03-02T07:50:00Z  
-**Current Phase:** PIPELINE COMPLETE  
-**Owner:** Pepper (Analyst)
+**Last Updated:** 2026-03-02 12:57 UTC  
+**Current Phase:** pepper_closeout_map_fix_v2 ✅ COMPLETE
 
 ---
 
-## Map Component Fix Pipeline
+## Pipeline Status
 
-| Phase | Agent | Session Key | Status | Started | Completed |
-|-------|-------|-------------|--------|---------|-----------|
-| **tony_arch_map_fix** | Tony | 741a8824-a4f3-49bb-a0b6-c031c4447a12 | ✅ DONE | 04:22 | 04:24 |
-| **peter_build_map_fix** | Peter | 5d1c9031-117f-40f7-b946-48fa6a2b4b90 | ✅ DONE | 04:24 | 04:39 |
-| **heimdall_qa_map_fix** | Heimdall | `agent:jarvis:subagent:98b53f71-9315-47d1-9f4b-0bcfbcb89364` | ✅ DONE | 07:35 | 07:45 |
-| **pepper_closeout_map_fix** | Pepper | `agent:jarvis:subagent:25a45afc-7664-400c-84d0-9b3a2608f420` | ✅ DONE | 07:46 | 07:50 |
-
-**Deliverables Verified:**
-- ✅ ARCH_MAP_COMPONENT.md (14KB) - Architecture decision document
-- ✅ TASKS_MAP_FIX.md (12KB) - Implementation tasks
-- ✅ MAP_COMPONENT_IMPLEMENTATION.md - Peter's implementation report
-- ✅ ConflictMap.tsx rewritten with MapLibre GL + supercluster
-- ✅ QA_MAP_FIX.md - Heimdall QA report
-
-**Implementation Summary:**
-- MapLibre GL selected (not Leaflet) for better performance
-- Marker clustering with supercluster (supports 1000+ events)
-- Error boundaries and loading states
-- Severity-based marker colors
-- Memory cleanup on unmount
-
-**QA Verdict:** ✅ PASS (Code Quality) / ⚠️ Environmental Issue (Docker network)
-- Unit Tests: 13/13 passing (100%)
-- TypeScript: No errors
-- Security Audit: PASS
-- Accessibility: 95/100
-- Code Quality: 95/100
-- **Note:** Map loading issue is environmental (Docker network restrictions), not a code bug
+| Phase | Agent | Status | Session | Timestamp |
+|-------|-------|--------|---------|-----------|
+| pepper_reqs | Pepper | ✅ COMPLETE | - | - |
+| tony_design | Tony | ✅ COMPLETE | - | - |
+| peter_build | Peter | ✅ COMPLETE | 470f7e6f-f4c2-4474-a454-0522fc5da633 | 2026-03-02 |
+| heimdall_qa_map_fix_v2 | Heimdall | **✅ PASS** | 65422969-9a7b-4cf6-8d44-4a4491ef14bb | 2026-03-02 12:12 UTC |
+| **pepper_closeout_map_fix_v2** | **Pepper** | **✅ COMPLETE** | **4f17e44c-b4b8-4cc3-b02b-108314f5ae64** | **2026-03-02 12:57 UTC** |
 
 ---
 
-## Previous Phase: pepper_closeout (GDELT Collector)
+## Heimdall QA Phase Details
 
-**Status:** COMPLETE  
-**Agent:** Pepper (Analyst)  
-**Session:** b5612054-a9f7-457d-b98c-819c42c2bca3  
-**Started:** 2026-03-01 23:26 UTC  
-**Completed:** 2026-03-01 23:26 UTC  
+**Phase:** heimdall_qa_map_fix_v2  
+**Agent:** Heimdall (Subagent)  
+**Status:** ✅ PASS  
+**Session:** 65422969-9a7b-4cf6-8d44-4a4491ef14bb
 
-## Deliverables (GDELT Phase)
-- ✅ Unit tests: 27/27 passing (100%)
-- ✅ Database integration: PostGIS working
-- ✅ API endpoint: `/api/v1/events` functional
-- ✅ Test data: 100+ events in database
-- ✅ Security audit: PASS
-- ✅ Owner: Peter (Developer)
+### QA Results
+- Architecture Compliance: ✅ PASS (Leaflet.js verified)
+- Unit Tests: ✅ 27/27 passing
+- Browser Testing: ✅ PASS (page loads, no errors)
+- Code Quality: ✅ PASS
+- Accessibility: ✅ PASS
 
----
-
-## Pipeline Status: ✅ COMPLETE
-
-**Map Component Fix Pipeline:** DONE - All phases complete
-
-**Closeout Summary:**
-- ✅ README.md updated with map component documentation
-- ✅ MAP_COMPONENT_GUIDE.md created (comprehensive usage guide)
-- ✅ MAP_FIX_FINAL_REPORT.md created (project summary)
-- ✅ RUN_STATE.md updated with completion status
-- All documentation committed to git
-
-**Final Deliverables:**
-- ConflictMap.tsx (385 lines) - Production-ready component
-- ConflictMap.test.tsx - 13/13 tests passing (100% coverage)
-- Architecture documentation (ARCH_MAP_COMPONENT.md)
-- Usage guide (MAP_COMPONENT_GUIDE.md)
-- Final report (MAP_FIX_FINAL_REPORT.md)
-
-**QA Verdict:** ✅ APPROVE FOR MERGE
-- Code Quality: 95/100
-- Security: 100/100
-- Accessibility: 95/100
-- Tests: 13/13 passing
-
-**Note:** Map loading issue in Docker is environmental (network restrictions), not a code bug. Component will work correctly in production with full network access.
-
-**Next Steps:** Merge to main, deploy to staging/production for runtime validation.
+### Deliverables
+- [x] `docs/agent-workflow/QA_MAP_COMPONENT_V2.md` created
+- [x] Screenshot captured: `/home/openclaw/.openclaw/media/browser/502d7314-58c8-4bdc-81e9-9c032c9777ca.png`
 
 ---
 
-## QA Summary (Heimdall)
+## Pepper Closeout Phase Details
 
-**Verdict:** ✅ APPROVE FOR MERGE
+**Phase:** pepper_closeout_map_fix_v2  
+**Agent:** Pepper (Subagent)  
+**Status:** ✅ COMPLETE  
+**Session:** 4f17e44c-b4b8-4cc3-b02b-108314f5ae64
 
-**Key Findings:**
-- All 13 unit tests passing
-- TypeScript compilation successful
-- Security audit passed
-- Code quality: 95/100
-- Accessibility: 95/100
+### Closeout Deliverables
+- [x] `README.md` - Updated with Leaflet.js map component documentation
+- [x] `docs/MAP_FIX_FINAL_REPORT_V2.md` - Final closeout report created
+- [x] `docs/RUN_STATE.md` - Marked as COMPLETE
+- [x] Git commit - All changes committed
 
-**Environmental Note:**
-Map component stuck in loading state in Docker dev environment due to network restrictions accessing external tile server (`demotiles.maplibre.org`). This is NOT a code bug - component will work correctly in production with proper network access.
+### Closeout Summary
+- **Timeline:** Round 1 FAIL (MapLibre) → Round 2 PASS (Leaflet.js)
+- **What Changed:** Migrated from MapLibre GL to Leaflet.js v1.9.4
+- **Test Coverage:** 27 unit tests passing
+- **Browser Verification:** Screenshot captured, page loads without errors
+- **Accessibility:** Full WCAG 2.1 AA compliance (ARIA, keyboard nav)
 
-**Recommendation:** Merge to main, validate in production/staging environment.
+### Next Action
+**Pipeline COMPLETE - Ready to notify user**
+
+---
+
+## Version Info
+**Component:** ConflictMap.tsx  
+**Implementation:** Leaflet.js with marker clustering  
+**Previous Issue:** Used MapLibre GL instead of Leaflet (Round 1 FAIL)  
+**Current Status:** All requirements met (Round 2 PASS)
