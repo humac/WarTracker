@@ -395,7 +395,28 @@ confidence = (
 
 WarTracker uses automated collectors to fetch conflict events from multiple sources.
 
-### Running the Collector
+### Manual Data Collection (Web Interface)
+
+**New in v1.0:** Trigger data collection directly from the dashboard!
+
+**How to Use:**
+1. Navigate to Dashboard (http://localhost:3000)
+2. Click **"🔄 Pull Latest Data"** button in header (top-right)
+3. Wait for response (5-30 seconds)
+   - **Loading:** Button shows spinner + "Fetching..."
+   - **Success:** Green alert "✅ Successfully collected X new events!"
+   - **Error:** Red alert "❌ Failed to fetch data. Please try again."
+4. Page auto-refreshes after 1.5s
+
+**How It Works:**
+- Button triggers `POST /api/v1/collect/gdelt` endpoint
+- Backend fetches latest events from GDELT API (**free, no API key required**)
+- Events are normalized and saved to database in background
+- Returns immediately with event count
+
+**Note:** GDELT API is free and publicly accessible. No API key required. However, some deployment environments may have network restrictions that prevent external API access.
+
+### Running the Collector (CLI)
 
 **Collect and save to database:**
 ```bash

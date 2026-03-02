@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, navigationMenuTriggerStyle } from '@/components/ui/navigation-menu'
 import { cn } from '@/lib/utils'
+import { Loader2 } from 'lucide-react'
 
 interface ConflictEvent {
   id: number
@@ -24,11 +25,35 @@ interface ConflictEvent {
 
 type Tab = 'map' | 'timeline' | 'alerts'
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [events, setEvents] = useState<ConflictEvent[]>([])
   const [activeTab, setActiveTab] = useState<Tab>('map')
+  const [isFetching, setIsFetching] = useState(false)
+  const [fetchResult, setFetchResult] = useState<{status: string, count: number} | null>(null)
+
+  const handleFetchData = async () => {
+    setIsFetching(true)
+    setFetchResult(null)
+    try {
+      const response = await fetch(`${API_URL}/api/v1/collect/gdelt`, {
+        method: 'POST',
+      })
+      const data = await response.json()
+      setFetchResult(data)
+      // Refresh events list after a short delay
+      setTimeout(() => {
+        window.location.reload()
+      }, 1500)
+    } catch (error) {
+      setFetchResult({ status: 'error', count: 0 })
+    } finally {
+      setIsFetching(false)
+    }
+  }
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -107,48 +132,70 @@ export default function Home() {
             <Badge variant="outline" className="ml-2">v1.0</Badge>
           </div>
           
-          <NavigationMenu>
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <NavigationMenuLink
-                  className={cn(
-                    navigationMenuTriggerStyle(),
-                    activeTab === 'map' && 'bg-accent'
-                  )}
-                  onClick={() => setActiveTab('map')}
-                >
-                  🗺️ Map
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <NavigationMenuLink
-                  className={cn(
-                    navigationMenuTriggerStyle(),
-                    activeTab === 'timeline' && 'bg-accent'
-                  )}
-                  onClick={() => setActiveTab('timeline')}
-                >
-                  📅 Timeline
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <NavigationMenuLink
-                  className={cn(
-                    navigationMenuTriggerStyle(),
-                    activeTab === 'alerts' && 'bg-accent'
-                  )}
-                  onClick={() => setActiveTab('alerts')}
-                >
-                  🔔 Alerts
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
+          <div className="flex items-center gap-4">
+            <Button 
+              onClick={handleFetchData} 
+              disabled={isFetching}
+              variant="default"
+              size="sm"
+            >
+              {isFetching && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isFetching ? 'Fetching...' : '🔄 Pull Latest Data'}
+            </Button>
+            
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuLink
+                    className={cn(
+                      navigationMenuTriggerStyle(),
+                      activeTab === 'map' && 'bg-accent'
+                    )}
+                    onClick={() => setActiveTab('map')}
+                  >
+                    🗺️ Map
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuLink
+                    className={cn(
+                      navigationMenuTriggerStyle(),
+                      activeTab === 'timeline' && 'bg-accent'
+                    )}
+                    onClick={() => setActiveTab('timeline')}
+                  >
+                    📅 Timeline
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuLink
+                    className={cn(
+                      navigationMenuTriggerStyle(),
+                      activeTab === 'alerts' && 'bg-accent'
+                    )}
+                    onClick={() => setActiveTab('alerts')}
+                  >
+                    🔔 Alerts
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+          </div>
         </div>
       </header>
 
       {/* Main Content */}
       <div className="container py-8">
+        {fetchResult && (
+          <Alert className="mb-6" variant={fetchResult.status === 'success' ? 'default' : 'destructive'}>
+            <AlertDescription>
+              {fetchResult.status === 'success' 
+                ? `✅ Successfully collected ${fetchResult.count} new events!`
+                : '❌ Failed to fetch data. Please try again.'}
+            </AlertDescription>
+          </Alert>
+        )}
+        
         {error ? (
           <Alert variant="destructive" className="mb-6">
             <AlertDescription>{error}</AlertDescription>
