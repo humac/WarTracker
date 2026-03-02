@@ -2,6 +2,15 @@
 
 import { useEffect, useState } from 'react'
 import { ConflictMap } from './components/ConflictMap'
+import { Timeline } from './components/Timeline'
+import { Alerts } from './components/Alerts'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, navigationMenuTriggerStyle } from '@/components/ui/navigation-menu'
+import { cn } from '@/lib/utils'
 
 interface ConflictEvent {
   id: number
@@ -10,133 +19,243 @@ interface ConflictEvent {
   longitude: number
   severity: number
   published_date: string
+  country_code: string
 }
+
+type Tab = 'map' | 'timeline' | 'alerts'
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [events, setEvents] = useState<ConflictEvent[]>([])
+  const [activeTab, setActiveTab] = useState<Tab>('map')
 
   useEffect(() => {
-    // Simulate loading and fetch mock data
-    const timer = setTimeout(() => {
-      // Mock events for demonstration
-      const mockEvents: ConflictEvent[] = [
-        { id: 1, title: "Conflict in region", latitude: 33.8886, longitude: 35.4955, severity: 4, published_date: "2026-03-01" },
-        { id: 2, title: "Border dispute escalation", latitude: 31.7683, longitude: 35.2137, severity: 3, published_date: "2026-03-01" },
-        { id: 3, title: "Ceasefire violation", latitude: 36.2032, longitude: 37.1598, severity: 5, published_date: "2026-02-28" }
-      ]
-      setEvents(mockEvents)
-      setIsLoading(false)
-    }, 1000)
+    const fetchEvents = async () => {
+      try {
+        const response = await fetch('/api/v1/events?limit=50')
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}))
+          throw new Error(errorData.details || `Failed to fetch: ${response.status}`)
+        }
+        const data = await response.json()
+        const apiEvents: ConflictEvent[] = data.events.map((e: any) => ({
+          id: e.id,
+          title: e.title,
+          latitude: e.latitude || 0,
+          longitude: e.longitude || 0,
+          severity: e.severity_score || 1,
+          published_date: e.event_timestamp ? new Date(e.event_timestamp).toISOString().split('T')[0] : 'Unknown'
+        }))
+        setEvents(apiEvents)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Unknown error')
+      } finally {
+        setIsLoading(false)
+      }
+    }
 
-    return () => clearTimeout(timer)
+    fetchEvents()
   }, [])
+
+  const getSeverityBadge = (severity: number) => {
+    const variants = {
+      1: 'severity1',
+      2: 'severity2',
+      3: 'severity3',
+      4: 'severity4',
+      5: 'severity5',
+    } as const
+    const variant = variants[severity as keyof typeof variants] || 'default'
+    const labels = {
+      1: 'Low',
+      2: 'Moderate',
+      3: 'Elevated',
+      4: 'High',
+      5: 'Critical',
+    }
+    return <Badge variant={variant}>{labels[severity as keyof typeof labels] || `Level ${severity}`}</Badge>
+  }
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-red-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-300">Loading WarTracker...</p>
-        </div>
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <Skeleton className="h-8 w-3/4" />
+            <Skeleton className="h-4 w-1/2" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <Skeleton className="h-32 w-full" />
+              <Skeleton className="h-32 w-full" />
+            </div>
+          </CardContent>
+        </Card>
       </div>
     )
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                🌍 WarTracker
-              </h1>
-            </div>
-            <nav className="flex space-x-4">
-              <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-                Map
-              </a>
-              <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-                Timeline
-              </a>
-              <a href="#" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-                Alerts
-              </a>
-            </nav>
+    <main className="min-h-screen bg-background">
+      {/* Header with shadcn Navigation Menu */}
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-16 items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">🌍</span>
+            <h1 className="text-xl font-bold text-foreground">WarTracker</h1>
+            <Badge variant="outline" className="ml-2">v1.0</Badge>
           </div>
+          
+          <NavigationMenu>
+            <NavigationMenuList>
+              <NavigationMenuItem>
+                <NavigationMenuLink
+                  className={cn(
+                    navigationMenuTriggerStyle(),
+                    activeTab === 'map' && 'bg-accent'
+                  )}
+                  onClick={() => setActiveTab('map')}
+                >
+                  🗺️ Map
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuLink
+                  className={cn(
+                    navigationMenuTriggerStyle(),
+                    activeTab === 'timeline' && 'bg-accent'
+                  )}
+                  onClick={() => setActiveTab('timeline')}
+                >
+                  📅 Timeline
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuLink
+                  className={cn(
+                    navigationMenuTriggerStyle(),
+                    activeTab === 'alerts' && 'bg-accent'
+                  )}
+                  onClick={() => setActiveTab('alerts')}
+                >
+                  🔔 Alerts
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
         </div>
       </header>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="container py-8">
         {error ? (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
-              </div>
-            </div>
-          </div>
+          <Alert variant="destructive" className="mb-6">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         ) : (
           <>
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-                Welcome to WarTracker
-              </h2>
-              <p className="text-gray-600 dark:text-gray-300 mb-6">
-                Real-time global conflict tracking and analysis platform. Monitor conflicts worldwide with verified, multi-source intelligence.
-              </p>
+            {/* Stats Overview */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Events</CardTitle>
+                  <span className="text-2xl">📊</span>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{events.length}</div>
+                  <p className="text-xs text-muted-foreground">Last 30 days</p>
+                </CardContent>
+              </Card>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-                  <h3 className="text-lg font-semibold text-green-800 dark:text-green-200">Active Conflicts</h3>
-                  <p className="text-3xl font-bold text-green-600 dark:text-green-400 mt-2">{events.length}</p>
-                </div>
-                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
-                  <h3 className="text-lg font-semibold text-yellow-800 dark:text-yellow-200">24h Changes</h3>
-                  <p className="text-3xl font-bold text-yellow-600 dark:text-yellow-400 mt-2">+2</p>
-                </div>
-                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-                  <h3 className="text-lg font-semibold text-red-800 dark:text-red-200">High Severity</h3>
-                  <p className="text-3xl font-bold text-red-600 dark:text-red-400 mt-2">{events.filter(e => e.severity >= 4).length}</p>
-                </div>
-              </div>
-
-              <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <p className="text-sm text-gray-500 dark:text-gray-400 italic">
-                  ⚠️ Data sourced from multiple providers including GDELT, ACLED, NewsAPI, and UN OCHA. 
-                  All events are cross-referenced for verification. WarTracker maintains strict political neutrality.
-                </p>
-              </div>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Critical</CardTitle>
+                  <span className="text-2xl">🔴</span>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{events.filter(e => e.severity >= 4).length}</div>
+                  <p className="text-xs text-muted-foreground">Severity 4-5</p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Countries</CardTitle>
+                  <span className="text-2xl">🌐</span>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{new Set(events.map(e => e.country_code)).size}</div>
+                  <p className="text-xs text-muted-foreground">Affected regions</p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Last Update</CardTitle>
+                  <span className="text-2xl">⏰</span>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{events.length > 0 ? 'Today' : 'N/A'}</div>
+                  <p className="text-xs text-muted-foreground">Real-time data</p>
+                </CardContent>
+              </Card>
             </div>
 
-            {/* Interactive Map */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-                Conflict Map
-              </h2>
-              <ConflictMap events={events} />
-            </div>
+            {/* Tab Content */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  {activeTab === 'map' && '🗺️ Global Conflict Map'}
+                  {activeTab === 'timeline' && '📅 Event Timeline'}
+                  {activeTab === 'alerts' && '🔔 Alerts & Notifications'}
+                </CardTitle>
+                <CardDescription>
+                  {activeTab === 'map' && 'Real-time visualization of conflicts worldwide. Click markers for details.'}
+                  {activeTab === 'timeline' && 'Chronological view of conflict events.'}
+                  {activeTab === 'alerts' && 'Manage your alert preferences and notifications.'}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {activeTab === 'map' && (
+                  <div className="space-y-6">
+                    <div className="flex gap-2 mb-4">
+                      <Badge variant="severity1">Low</Badge>
+                      <Badge variant="severity2">Moderate</Badge>
+                      <Badge variant="severity3">Elevated</Badge>
+                      <Badge variant="severity4">High</Badge>
+                      <Badge variant="severity5">Critical</Badge>
+                    </div>
+                    <ConflictMap events={events} />
+                  </div>
+                )}
+                
+                {activeTab === 'timeline' && (
+                  <Timeline events={events} />
+                )}
+                
+                {activeTab === 'alerts' && (
+                  <Alerts events={events} />
+                )}
+              </CardContent>
+            </Card>
           </>
         )}
       </div>
 
       {/* Footer */}
-      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-            © 2026 WarTracker. Data provided for informational purposes only. 
-            <a href="#" className="ml-2 text-gray-600 dark:text-gray-300 hover:underline">Privacy Policy</a>
-            <a href="#" className="ml-4 text-gray-600 dark:text-gray-300 hover:underline">Terms of Service</a>
-          </p>
+      <footer className="border-t bg-muted/50 mt-8">
+        <div className="container py-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-sm text-muted-foreground text-center md:text-left">
+              © 2026 WarTracker. Data provided for informational purposes only.
+            </p>
+            <div className="flex gap-4">
+              <Button variant="link" className="text-sm">Privacy Policy</Button>
+              <Button variant="link" className="text-sm">Terms of Service</Button>
+              <Button variant="link" className="text-sm">About</Button>
+            </div>
+          </div>
         </div>
       </footer>
     </main>

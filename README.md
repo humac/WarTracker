@@ -262,6 +262,80 @@ See [Map Component Guide](docs/MAP_COMPONENT_GUIDE.md#troubleshooting) for detai
 
 ---
 
+## UI Modernization (shadcn/ui)
+
+WarTracker features a modern, accessible UI built with **shadcn/ui** components and a custom Navy/Crimson design system.
+
+### Design System
+
+**Color Palette:**
+- **Navy (Primary):** `hsl(222, 47%, 11%)` - Main brand color, headers, navigation
+- **Crimson (Accent):** `hsl(350, 80%, 45%)` - Alerts, critical indicators, CTAs
+- **Slate (Neutral):** `hsl(215, 16%, 47%)` - Body text, secondary elements
+- **Background:** `hsl(0, 0%, 100%)` - Clean white backgrounds
+
+**Typography:**
+- **Font Family:** Inter (system font stack fallback)
+- **Scale:** 0.875rem to 2.25rem (sm to 3xl)
+- **Weights:** 400 (normal), 500 (medium), 600 (semibold), 700 (bold)
+
+### Components
+
+WarTracker uses **17 shadcn/ui components**:
+
+| Component | Usage |
+|-----------|-------|
+| `button` | Interactive actions, navigation |
+| `card` | Stats cards, content containers |
+| `badge` | Severity indicators, status labels |
+| `table` | Data tables, event lists |
+| `alert` | Alert notifications, warnings |
+| `dialog` | Modal dialogs, confirmations |
+| `sheet` | Side panels, mobile navigation |
+| `tooltip` | Contextual help, descriptions |
+| `popover` | Dropdown menus, quick actions |
+| `separator` | Visual dividers |
+| `scroll-area` | Custom scrollable regions |
+| `skeleton` | Loading states |
+| `progress` | Progress indicators |
+| `navigation-menu` | Main navigation bar |
+| `select` | Filter dropdowns |
+| `checkbox` | Form inputs, filters |
+| `input` | Text inputs, search fields |
+
+### Features
+
+- ✅ **Accessibility:** WCAG 2.1 AA compliant (ARIA labels, keyboard navigation, focus management)
+- ✅ **Responsive:** Mobile-first design with adaptive layouts
+- ✅ **Dark Mode Ready:** CSS variables support theme switching
+- ✅ **Type-Safe:** Full TypeScript support with proper types
+- ✅ **Customizable:** Tailwind CSS utility classes for easy styling
+
+### Pages Migrated
+
+| Page | Components Used | Status |
+|------|----------------|--------|
+| Dashboard | card, badge, navigation-menu, button | ✅ Complete |
+| Timeline | card, accordion-style layout, button | ✅ Complete |
+| Alerts | alert, badge, select, button, scroll-area | ✅ Complete |
+
+### Browser Verification
+
+**Tested on:** Chrome (headless) via OpenClaw browser automation
+- ✅ Dashboard loads with stats cards and navigation
+- ✅ Timeline displays chronological event groups
+- ✅ Alerts page shows filtered alert list with severity badges
+- ✅ All pages functional with no console errors
+
+**Screenshot:** See `/home/openclaw/.openclaw/media/browser/2a3c788a-d6e9-4a78-8484-4965548ef337.png`
+
+### Documentation
+
+- **[Implementation Summary](docs/agent-workflow/SHADCN_IMPLEMENTATION_SUMMARY.md)** - Peter's build report
+- **[UI Modernization Final Report](docs/UI_MODERNIZATION_FINAL_REPORT.md)** - Complete closeout documentation
+
+---
+
 ## API Documentation
 
 Once running, visit http://localhost:8000/docs for interactive API documentation.

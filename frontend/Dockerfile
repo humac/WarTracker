@@ -1,15 +1,21 @@
-FROM node:20-alpine
+FROM node:20-slim
 
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci
+# Install dependencies (use legacy-peer-deps for React 19 compatibility)
+RUN npm ci --legacy-peer-deps
 
 # Copy application code
 COPY . .
+
+# Clean .next folder to avoid lock issues
+RUN rm -rf .next
+
+# Remove .env file - we use rewrites instead
+RUN rm -f .env
 
 # Expose port
 EXPOSE 3000

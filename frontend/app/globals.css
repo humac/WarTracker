@@ -16,16 +16,6 @@
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
-
 @layer utilities {
   .text-balance {
     text-wrap: balance;
@@ -67,4 +57,99 @@ body {
 
 .dark ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
+}
+
+
+
+@layer base {
+  :root {
+    /* WarTracker Design System - Professional conflict data UI */
+    /* Primary: Deep Navy - conveys trust, authority, gravity */
+    --primary: 222 47% 11%;
+    --primary-foreground: 0 0% 98%;
+    
+    /* Accent: Crimson Red - urgency, importance (used sparingly) */
+    --accent: 0 84% 60%;
+    --accent-foreground: 0 0% 98%;
+    
+    /* Background & Foreground */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    
+    /* Cards & Popovers */
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    
+    /* Secondary & Muted */
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 210 20% 50%;
+    
+    /* Destructive (for critical alerts) */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    
+    /* Borders & Inputs */
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 222 47% 11%;
+    
+    /* Charts & Data Visualization */
+    --chart-1: 222 47% 11%;  /* Navy */
+    --chart-2: 0 84% 60%;    /* Crimson */
+    --chart-3: 210 40% 60%;  /* Blue */
+    --chart-4: 30 80% 55%;   /* Orange */
+    --chart-5: 120 60% 45%;  /* Green */
+    
+    /* Border Radius */
+    --radius: 0.5rem;
+  }
+  
+  .dark {
+    /* WarTracker Dark Mode - respectful of serious content */
+    --primary: 210 40% 98%;
+    --primary-foreground: 222 47% 11%;
+    
+    --accent: 0 84% 60%;
+    --accent-foreground: 0 0% 98%;
+    
+    --background: 222 47% 5%;
+    --foreground: 210 40% 98%;
+    
+    --card: 222 47% 8%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 8%;
+    --popover-foreground: 210 40% 98%;
+    
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 210 40% 98%;
+    
+    --chart-1: 210 40% 98%;
+    --chart-2: 0 84% 60%;
+    --chart-3: 210 40% 70%;
+    --chart-4: 30 80% 60%;
+    --chart-5: 120 60% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
 }
