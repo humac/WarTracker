@@ -55,9 +55,11 @@ WarTracker provides real-time, verified information on global conflicts by conti
 
 ### Prerequisites
 
-- Docker & Docker Compose
+- **Docker & Docker Compose** (required for PostgreSQL + PostGIS)
 - Node.js 20+ (for local frontend development)
 - Python 3.11+ (for local backend development)
+
+**Important:** WarTracker requires **PostgreSQL with PostGIS** extension for geospatial queries. The easiest way to set this up is using Docker Compose (included in this repo).
 
 ### Development Setup
 
@@ -67,23 +69,40 @@ WarTracker provides real-time, verified information on global conflicts by conti
    cd WarTracker
    ```
 
-2. **Start all services with Docker**
+2. **Start database services (PostgreSQL + PostGIS + Redis)**
    ```bash
-   docker-compose up -d
+   docker compose up -d postgres redis
+   ```
+   
+   Wait ~10 seconds for PostgreSQL to initialize.
+
+3. **Enable PostGIS extension**
+   ```bash
+   docker exec wartracker-postgres psql -U postgres -d wartracker -c "CREATE EXTENSION IF NOT EXISTS postgis;"
    ```
 
-3. **Run database migrations**
+4. **Run database migrations**
    ```bash
    cd backend
+   python -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
    alembic upgrade head
    ```
 
-4. **Seed initial data**
+5. **Start backend**
    ```bash
-   python scripts/seed_data.py
+   uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
    ```
 
-5. **Access the application**
+6. **Start frontend**
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+
+7. **Access the application**
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:8000
    - API Documentation: http://localhost:8000/docs

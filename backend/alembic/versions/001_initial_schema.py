@@ -42,8 +42,8 @@ def upgrade() -> None:
         sa.CheckConstraint('credibility_tier >= 1 AND credibility_tier <= 4', name='valid_tier'),
         sa.CheckConstraint('credibility_score >= 0.0 AND credibility_score <= 1.0', name='valid_credibility_score'),
     )
-    op.create_index('idx_sources_active', 'sources', ['is_active'], unique=False)
-    op.create_index('idx_sources_tier', 'sources', ['credibility_tier'], unique=False)
+    op.create_index('idx_sources_active', 'sources', ['is_active'], unique=False, if_not_exists=True)
+    op.create_index('idx_sources_tier', 'sources', ['credibility_tier'], unique=False, if_not_exists=True)
 
     # Create regions table
     op.create_table('regions',
@@ -57,9 +57,9 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(['parent_region_id'], ['regions.id'], ),
         sa.PrimaryKeyConstraint('id'),
     )
-    op.create_index('idx_regions_boundary', 'regions', ['boundary'], unique=False, postgresql_using='gist')
-    op.create_index('idx_regions_country', 'regions', ['country_code'], unique=False)
-    op.create_index('idx_regions_type', 'regions', ['region_type'], unique=False)
+    op.create_index('idx_regions_boundary', 'regions', ['boundary'], unique=False, postgresql_using='gist', if_not_exists=True)
+    op.create_index('idx_regions_country', 'regions', ['country_code'], unique=False, if_not_exists=True)
+    op.create_index('idx_regions_type', 'regions', ['region_type'], unique=False, if_not_exists=True)
 
     # Create conflict_events table
     op.create_table('conflict_events',
@@ -87,13 +87,13 @@ def upgrade() -> None:
         sa.CheckConstraint('severity_score >= 1 AND severity_score <= 5', name='valid_severity'),
         sa.CheckConstraint('confidence_score >= 0.0 AND confidence_score <= 1.0', name='valid_confidence'),
     )
-    op.create_index('idx_conflict_events_location', 'conflict_events', ['location'], unique=False, postgresql_using='gist')
-    op.create_index('idx_conflict_events_active_severity', 'conflict_events', ['is_active', 'severity_score'], unique=False)
-    op.create_index('idx_conflict_events_timestamp', 'conflict_events', ['event_timestamp'], unique=False)
-    op.create_index('idx_conflict_events_country', 'conflict_events', ['country_code'], unique=False)
-    op.create_index('idx_conflict_events_region', 'conflict_events', ['region_name'], unique=False)
-    op.create_index('idx_conflict_events_type', 'conflict_events', ['event_type'], unique=False)
-    op.create_index('idx_conflict_events_verification', 'conflict_events', ['verification_status'], unique=False)
+    op.create_index('idx_conflict_events_location', 'conflict_events', ['location'], unique=False, postgresql_using='gist', if_not_exists=True)
+    op.create_index('idx_conflict_events_active_severity', 'conflict_events', ['is_active', 'severity_score'], unique=False, if_not_exists=True)
+    op.create_index('idx_conflict_events_timestamp', 'conflict_events', ['event_timestamp'], unique=False, if_not_exists=True)
+    op.create_index('idx_conflict_events_country', 'conflict_events', ['country_code'], unique=False, if_not_exists=True)
+    op.create_index('idx_conflict_events_region', 'conflict_events', ['region_name'], unique=False, if_not_exists=True)
+    op.create_index('idx_conflict_events_type', 'conflict_events', ['event_type'], unique=False, if_not_exists=True)
+    op.create_index('idx_conflict_events_verification', 'conflict_events', ['verification_status'], unique=False, if_not_exists=True)
 
     # Create users table
     op.create_table('users',
@@ -114,9 +114,9 @@ def upgrade() -> None:
         sa.UniqueConstraint('email'),
         sa.UniqueConstraint('username'),
     )
-    op.create_index('idx_users_email', 'users', ['email'], unique=False)
-    op.create_index('idx_users_role', 'users', ['role'], unique=False)
-    op.create_index('idx_users_active', 'users', ['is_active'], unique=False)
+    op.create_index('idx_users_email', 'users', ['email'], unique=False, if_not_exists=True)
+    op.create_index('idx_users_role', 'users', ['role'], unique=False, if_not_exists=True)
+    op.create_index('idx_users_active', 'users', ['is_active'], unique=False, if_not_exists=True)
 
     # Create verifications table
     op.create_table('verifications',
@@ -135,9 +135,9 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('conflict_event_id', 'source_id', name='uix_event_source'),
     )
-    op.create_index('idx_verifications_event', 'verifications', ['conflict_event_id'], unique=False)
-    op.create_index('idx_verifications_source', 'verifications', ['source_id'], unique=False)
-    op.create_index('idx_verifications_method', 'verifications', ['verification_method'], unique=False)
+    op.create_index('idx_verifications_event', 'verifications', ['conflict_event_id'], unique=False, if_not_exists=True)
+    op.create_index('idx_verifications_source', 'verifications', ['source_id'], unique=False, if_not_exists=True)
+    op.create_index('idx_verifications_method', 'verifications', ['verification_method'], unique=False, if_not_exists=True)
 
     # Create alerts table
     op.create_table('alerts',
@@ -158,9 +158,9 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint('id'),
         sa.CheckConstraint('severity_threshold >= 1 AND severity_threshold <= 5', name='valid_severity_threshold'),
     )
-    op.create_index('idx_alerts_user', 'alerts', ['user_id'], unique=False)
-    op.create_index('idx_alerts_active', 'alerts', ['is_active'], unique=False)
-    op.create_index('idx_alerts_severity', 'alerts', ['severity_threshold'], unique=False)
+    op.create_index('idx_alerts_user', 'alerts', ['user_id'], unique=False, if_not_exists=True)
+    op.create_index('idx_alerts_active', 'alerts', ['is_active'], unique=False, if_not_exists=True)
+    op.create_index('idx_alerts_severity', 'alerts', ['severity_threshold'], unique=False, if_not_exists=True)
 
     # Create bookmarks table
     op.create_table('bookmarks',
@@ -173,8 +173,8 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('user_id', 'conflict_event_id', name='uix_user_event'),
     )
-    op.create_index('idx_bookmarks_user', 'bookmarks', ['user_id'], unique=False)
-    op.create_index('idx_bookmarks_event', 'bookmarks', ['conflict_event_id'], unique=False)
+    op.create_index('idx_bookmarks_user', 'bookmarks', ['user_id'], unique=False, if_not_exists=True)
+    op.create_index('idx_bookmarks_event', 'bookmarks', ['conflict_event_id'], unique=False, if_not_exists=True)
 
     # Create user_preferences table
     op.create_table('user_preferences',
