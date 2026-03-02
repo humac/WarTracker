@@ -65,9 +65,46 @@ async def list_events(
         # Pagination
         events = query.offset(skip).limit(limit).all()
         
+        # Manually serialize events (PostGIS geometry needs special handling)
+        serialized_events = []
+        for event in events:
+            event_dict = {
+                "id": event.id,
+                "title": event.title,
+                "description": event.description,
+                "event_type": event.event_type,
+                "severity_score": event.severity_score,
+                "event_timestamp": event.event_timestamp.isoformat() if event.event_timestamp else None,
+                "verification_status": event.verification_status,
+                "confidence_score": event.confidence_score,
+                "country_code": event.country_code,
+                "region_name": event.region_name,
+                "is_active": event.is_active,
+                "conflict_id": event.conflict_id,
+                # Extract lat/lon from PostGIS geometry
+                "latitude": None,
+                "longitude": None
+            }
+            
+            # Convert PostGIS geometry to lat/lon
+            if event.location:
+                try:
+                    # Query to extract coordinates
+                    result = db.execute(
+                        text("SELECT ST_Y(location), ST_X(location) FROM conflict_events WHERE id = :id"),
+                        {"id": event.id}
+                    ).first()
+                    if result:
+                        event_dict["latitude"] = result[0]
+                        event_dict["longitude"] = result[1]
+                except Exception:
+                    pass
+            
+            serialized_events.append(event_dict)
+        
         return {
-            "events": events,
-            "total": len(events),
+            "events": serialized_events,
+            "total": len(serialized_events),
             "skip": skip,
             "limit": limit
         }
