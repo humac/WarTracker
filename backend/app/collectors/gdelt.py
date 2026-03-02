@@ -1,8 +1,15 @@
-"""GDELT Project Collector - FREE, no API key required"""
+"""GDELT Project Collector - FREE, no API key required
+
+GDELT (Global Database of Events, Language, and Tone) monitors the world's 
+broadcast, print, and web news from nearly every country in over 100 languages.
+
+Supported by Google Jigsaw.
+Docs: https://www.gdeltproject.org/data.html
+"""
 import httpx
 import asyncio
 from typing import List, Dict, Any
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from geoalchemy2.shape import from_shape
 from shapely.geometry import Point
 from .base import BaseCollector
@@ -160,9 +167,9 @@ class GDELTCollector(BaseCollector):
             elif len(date_str) >= 8:
                 event_date = datetime.strptime(date_str[:8], "%Y%m%d")
             else:
-                event_date = datetime.utcnow()
+                event_date = datetime.now(timezone.utc)
         except (ValueError, TypeError):
-            event_date = datetime.utcnow()
+            event_date = datetime.now(timezone.utc)
         
         # Determine event type from keywords in title
         title = article.get("title", "").lower()

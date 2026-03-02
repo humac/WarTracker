@@ -210,6 +210,82 @@ confidence = (
 | Developing | 2 sources, confidence ≥0.5 | ⚡ Developing |
 | Unverified | <2 sources or confidence <0.5 | ⚠ Unverified |
 
+## Data Collection
+
+WarTracker uses automated collectors to fetch conflict events from multiple sources.
+
+### Running the Collector
+
+**Collect and save to database:**
+```bash
+cd backend
+source venv/bin/activate
+python scripts/collect_data.py --limit 100
+```
+
+**Dry run (preview without saving):**
+```bash
+python scripts/collect_data.py --dry-run --limit 5
+```
+
+**Collect from specific sources:**
+```bash
+python scripts/collect_data.py --sources gdelt --limit 50
+```
+
+### Collector Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--sources` | Comma-separated list of sources (e.g., `gdelt,acled`) | All enabled |
+| `--limit` | Maximum records per source | 100 |
+| `--dry-run` | Collect but don't save to database | False |
+
+### Available Data Sources
+
+| Source | Type | API Key Required | Status |
+|--------|------|------------------|--------|
+| GDELT | News/Events | ❌ No | ✅ Enabled |
+| ACLED | Conflict Events | ✅ Yes | ⏸️ Disabled |
+| NewsAPI | News Articles | ✅ Yes | ⏸️ Disabled |
+
+### Adding New Collectors
+
+1. Create a new collector class in `backend/app/collectors/`:
+   ```python
+   from .base import BaseCollector
+   
+   class MyCollector(BaseCollector):
+       name = "mysource"
+       requires_api_key = True/False
+       
+       async def fetch(self):
+           # Fetch raw data
+           pass
+       
+       def normalize(self, raw_data):
+           # Normalize to WarTracker schema
+           pass
+   ```
+
+2. Register in `backend/app/collectors/manager.py`:
+   ```python
+   from .mysource import MyCollector
+   self.collectors["mysource"] = MyCollector()
+   ```
+
+3. Add dependencies to `requirements.txt`
+
+### Testing Collectors
+
+```bash
+# Run collector unit tests
+pytest tests/test_collectors.py -v
+
+# Test with coverage
+pytest tests/test_collectors.py --cov=app.collectors
+```
+
 ## Testing
 
 ### Backend Tests

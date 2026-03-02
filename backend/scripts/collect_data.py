@@ -15,7 +15,7 @@ Usage:
 import asyncio
 import sys
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -37,7 +37,7 @@ async def collect_and_store(dry_run: bool = False, sources: list = None, limit: 
         limit: Max records per source
     """
     print(f"🌍 WarTracker Data Collection")
-    print(f"Started: {datetime.utcnow().isoformat()}")
+    print(f"Started: {datetime.now(timezone.utc).isoformat()}")
     print(f"Dry run: {dry_run}")
     print(f"Sources: {sources or 'all enabled'}")
     print("-" * 50)

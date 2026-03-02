@@ -1,6 +1,10 @@
-"""Collector Manager - Orchestrates all data collectors"""
+"""Collector Manager - Orchestrates all data collectors
+
+Manages all data collectors and orchestrates data collection.
+Prioritizes free sources (GDELT) by default.
+"""
 from typing import List, Dict, Any, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from .base import BaseCollector
 from .gdelt import GDELTCollector
 
@@ -92,11 +96,11 @@ class CollectorManager:
                 self.stats["errors"].append({
                     "source": source_name,
                     "error": str(e),
-                    "timestamp": datetime.utcnow()
+                    "timestamp": datetime.now(timezone.utc)
                 })
                 await self._update_source_status(source_name, "error", 0, str(e))
         
-        self.stats["last_collection"] = datetime.utcnow()
+        self.stats["last_collection"] = datetime.now(timezone.utc)
         
         print(f"Collection complete: {len(all_events)} total events")
         
