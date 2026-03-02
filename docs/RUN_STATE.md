@@ -18,6 +18,8 @@
 | **peter_build_ui_shadcn** | **Peter** | **✅ COMPLETE** | **0272d01e-db0e-4136-a2f4-c510df78b0f6** | **2026-03-02 19:48 UTC** |
 | **heimdall_qa_ui_shadcn** | **Heimdall** | **✅ PASS** | **d1681891-a769-4e3c-80d5-191aa7248368** | **2026-03-02 20:44 UTC** |
 | **pepper_closeout_ui_shadcn** | **Pepper** | **✅ COMPLETE** | **d68ca22a-9a28-4f75-bba5-76cc8e356f8d** | **2026-03-02 20:50 UTC** |
+| **peter_build_manual_trigger** | **Peter** | **✅ COMPLETE** | **50e13622-15a0-4bcb-8724-eb924d4f4663** | **2026-03-02 23:02 UTC** |
+| **heimdall_qa_manual_trigger** | **Heimdall** | **✅ CONDITIONAL PASS** | **1b918412-36fc-4b75-9da7-656f696423bd** | **2026-03-02 23:28 UTC** |
 
 ---
 
@@ -135,6 +137,33 @@
 
 ### Next Action
 **Pipeline COMPLETE - Commit changes and notify user**
+
+---
+
+## Manual Trigger Feature QA
+
+**Phase:** heimdall_qa_manual_trigger  
+**Agent:** Heimdall (Subagent)  
+**Status:** ✅ CONDITIONAL PASS  
+**Session:** 1b918412-36fc-4b75-9da7-656f696423bd
+
+**QA Results:**
+- [x] Backend endpoint verified (correct structure)
+- [x] Frontend button verified (complete implementation)
+- [x] Loading state works correctly
+- [x] Error handling implemented
+- [x] Browser screenshots captured
+- [x] TypeScript types complete
+- [ ] Backend timeout handling (needs fix before production)
+
+**Deliverables:**
+- [x] `docs/agent-workflow/QA_MANUAL_TRIGGER.md` created
+- [x] Screenshots: `d8ae251c-ce54-4ce0-a9de-b5013fde818d.png`, `dda66ac0-ca87-4b68-89c6-281cb9a98e5c.png`
+
+**Verdict:** CONDITIONAL PASS - Feature complete, needs timeout config before production
+
+### Next Action
+**Spawn Pepper for closeout**
 
 ---
 
