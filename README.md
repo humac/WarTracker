@@ -233,6 +233,12 @@ python scripts/collect_data.py --dry-run --limit 5
 python scripts/collect_data.py --sources gdelt --limit 50
 ```
 
+### GDELT Collector Documentation
+
+For detailed usage, scheduling, and API access:
+- **[GDELT Collector Guide](docs/GDELT_COLLECTOR_GUIDE.md)** - Complete usage documentation
+- **[GDELT Implementation Report](docs/GDELT_IMPLEMENTATION_REPORT.md)** - Technical report and test results
+
 ### Collector Options
 
 | Option | Description | Default |
