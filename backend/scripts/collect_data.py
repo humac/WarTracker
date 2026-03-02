@@ -22,8 +22,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.collectors.manager import CollectorManager
 from app.database import get_db
-from app.models import ConflictEvent, Source
+from app.models import ConflictEvent
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 
 
 async def collect_and_store(dry_run: bool = False, sources: list = None, limit: int = None):
@@ -67,7 +68,7 @@ async def collect_and_store(dry_run: bool = False, sources: list = None, limit: 
         for i, event in enumerate(events[:3], 1):
             print(f"\n  {i}. {event['title']}")
             print(f"     Type: {event['event_type']}, Severity: {event['severity_score']}")
-            print(f"     Location: {event['latitude']}, {event['longitude']}")
+            print(f"     Location: {event['location']}")
             print(f"     Date: {event['event_timestamp']}")
         return
     
@@ -80,12 +81,46 @@ async def collect_and_store(dry_run: bool = False, sources: list = None, limit: 
         
         for event_data in events:
             try:
-                # Create ConflictEvent from dict
-                event = ConflictEvent(**event_data)
-                db.add(event)
+                # Use raw SQL to insert with PostGIS geometry
+                location_wkt = event_data.get('location', 'POINT(0 0)')
+                
+                db.execute(
+                    text("""
+                        INSERT INTO conflict_events (
+                            location, event_type, title, description, severity_score,
+                            event_timestamp, verification_status, confidence_score,
+                            is_active, actors_involved, country_code, region_name,
+                            ai_summary, conflict_id, created_at, updated_at
+                        ) VALUES (
+                            ST_GeomFromText(:wkt, 4326),
+                            :event_type, :title, :description, :severity_score,
+                            :event_timestamp, :verification_status, :confidence_score,
+                            :is_active, '[]'::jsonb, :country_code, :region_name,
+                            :ai_summary, :conflict_id, NOW(), NOW()
+                        )
+                    """),
+                    {
+                        "wkt": location_wkt,
+                        "event_type": event_data.get('event_type', 'other'),
+                        "title": event_data.get('title', '')[:500],
+                        "description": event_data.get('description', ''),
+                        "severity_score": event_data.get('severity_score', 2),
+                        "event_timestamp": event_data.get('event_timestamp'),
+                        "verification_status": event_data.get('verification_status', 'unverified'),
+                        "confidence_score": event_data.get('confidence_score', 0.5),
+                        "is_active": event_data.get('is_active', True),
+                        "actors_involved": "[]",  # JSON array as string
+                        "country_code": event_data.get('country_code'),
+                        "region_name": event_data.get('region_name', ''),
+                        "ai_summary": None,
+                        "conflict_id": event_data.get('conflict_id', '')
+                    }
+                )
+                
                 saved_count += 1
+                
             except Exception as e:
-                print(f"  ⚠️  Error saving event: {e}")
+                print(f"  ⚠️  Error saving event: {type(e).__name__}: {e}")
                 continue
         
         db.commit()

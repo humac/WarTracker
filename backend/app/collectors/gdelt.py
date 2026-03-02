@@ -3,6 +3,8 @@ import httpx
 import asyncio
 from typing import List, Dict, Any
 from datetime import datetime, timedelta
+from geoalchemy2.shape import from_shape
+from shapely.geometry import Point
 from .base import BaseCollector
 
 
@@ -68,7 +70,8 @@ class GDELTCollector(BaseCollector):
             "User-Agent": "WarTracker/1.0 (Conflict Tracking Platform)"
         }
         
-        async with httpx.AsyncClient(headers=headers, timeout=30.0) as client:
+        # Use longer timeout and retry logic for GDELT
+        async with httpx.AsyncClient(headers=headers, timeout=60.0) as client:
             # Fetch recent conflict news (last 24 hours)
             # GDELT requires parentheses around OR'd terms
             query = "(" + " OR ".join(self.CONFLICT_QUERIES) + ")"
@@ -82,7 +85,18 @@ class GDELTCollector(BaseCollector):
             }
             
             try:
-                response = await client.get(self.BASE_URL, params=params)
+                # Retry up to 3 times on connection errors
+                for attempt in range(3):
+                    try:
+                        response = await client.get(self.BASE_URL, params=params)
+                        break
+                    except httpx.ConnectTimeout:
+                        if attempt < 2:
+                            print(f"GDELT connection timeout, retrying ({attempt+1}/3)...")
+                            await asyncio.sleep(2)
+                        else:
+                            raise
+                
                 print(f"GDELT Response status: {response.status_code}")
                 print(f"GDELT Response length: {len(response.content)} bytes")
                 if len(response.content) < 500:
@@ -157,11 +171,15 @@ class GDELTCollector(BaseCollector):
         # Estimate severity based on event type
         severity = self._estimate_severity(event_type)
         
+        # Create PostGIS geometry object using GeoAlchemy2 + Shapely
+        # Note: We'll convert this to WKT in the script for insertion
+        location_wkt = f"POINT({longitude} {latitude})"
+        
         return {
             "title": article.get("title", "Untitled Event"),
             "description": article.get("snippet", ""),
             "event_timestamp": event_date,
-            "location": f"POINT({longitude} {latitude})",  # WKT format for PostGIS
+            "location": location_wkt,  # WKT format - will be converted to geometry on insert
             "severity_score": severity,
             "event_type": event_type,
             "actors_involved": [],

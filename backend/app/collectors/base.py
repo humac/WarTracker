@@ -59,5 +59,14 @@ class BaseCollector(ABC):
         Returns:
             True if valid, False otherwise
         """
-        required_fields = ['title', 'event_timestamp', 'latitude', 'longitude']
-        return all(field in event and event[field] is not None for field in required_fields)
+        required_fields = ['title', 'event_timestamp', 'location']
+        for field in required_fields:
+            if field not in event or event[field] is None:
+                return False
+        
+        # Validate location is in WKT format (POINT(lon lat))
+        location = event.get('location', '')
+        if not isinstance(location, str) or not location.startswith('POINT('):
+            return False
+        
+        return True
