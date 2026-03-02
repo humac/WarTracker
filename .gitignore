@@ -49,3 +49,4 @@ temp/
 # Project-specific (add as needed)
 # *.sqlite
 # uploads/
+__pycache__/
