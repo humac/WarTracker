@@ -9,7 +9,6 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
-from geoalchemy2 import Geometry
 
 
 # revision identifiers, used by Alembic.
@@ -50,22 +49,23 @@ def upgrade() -> None:
         sa.Column('id', sa.BigInteger(), sa.Identity(), nullable=False),
         sa.Column('name', sa.String(200), nullable=False),
         sa.Column('country_code', sa.String(2), nullable=True),
-        sa.Column('boundary', Geometry('POLYGON', srid=4326), nullable=True),
+        sa.Column('boundary_wkt', sa.Text(), nullable=True),
         sa.Column('region_type', sa.String(50), nullable=True, default='country'),
         sa.Column('parent_region_id', sa.BigInteger(), nullable=True),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=True),
         sa.ForeignKeyConstraint(['parent_region_id'], ['regions.id'], ),
         sa.PrimaryKeyConstraint('id'),
     )
-    op.create_index('idx_regions_boundary', 'regions', ['boundary'], unique=False, postgresql_using='gist', if_not_exists=True)
     op.create_index('idx_regions_country', 'regions', ['country_code'], unique=False, if_not_exists=True)
     op.create_index('idx_regions_type', 'regions', ['region_type'], unique=False, if_not_exists=True)
 
     # Create conflict_events table
     op.create_table('conflict_events',
         sa.Column('id', sa.BigInteger(), sa.Identity(), nullable=False),
-        sa.Column('location', Geometry('POINT', srid=4326), nullable=False),
-        sa.Column('location_display', Geometry('POINT', srid=4326), nullable=True),
+        sa.Column('latitude', sa.Float(), nullable=False),
+        sa.Column('longitude', sa.Float(), nullable=False),
+        sa.Column('latitude_display', sa.Float(), nullable=True),
+        sa.Column('longitude_display', sa.Float(), nullable=True),
         sa.Column('event_type', sa.String(50), nullable=False),
         sa.Column('title', sa.String(500), nullable=False),
         sa.Column('description', sa.Text(), nullable=True),
@@ -87,7 +87,7 @@ def upgrade() -> None:
         sa.CheckConstraint('severity_score >= 1 AND severity_score <= 5', name='valid_severity'),
         sa.CheckConstraint('confidence_score >= 0.0 AND confidence_score <= 1.0', name='valid_confidence'),
     )
-    op.create_index('idx_conflict_events_location', 'conflict_events', ['location'], unique=False, postgresql_using='gist', if_not_exists=True)
+    op.create_index('idx_conflict_events_lat_lon', 'conflict_events', ['latitude', 'longitude'], unique=False, if_not_exists=True)
     op.create_index('idx_conflict_events_active_severity', 'conflict_events', ['is_active', 'severity_score'], unique=False, if_not_exists=True)
     op.create_index('idx_conflict_events_timestamp', 'conflict_events', ['event_timestamp'], unique=False, if_not_exists=True)
     op.create_index('idx_conflict_events_country', 'conflict_events', ['country_code'], unique=False, if_not_exists=True)

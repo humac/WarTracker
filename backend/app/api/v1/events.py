@@ -7,6 +7,7 @@ from datetime import datetime
 from app.database import get_db
 from app.models import ConflictEvent
 import structlog
+import math
 
 logger = structlog.get_logger()
 
@@ -35,15 +36,17 @@ async def list_events(
     try:
         query = db.query(ConflictEvent)
         
-        # Geospatial filter
+        # Basic geospatial filter (simple bounding box, not radius)
         if lat is not None and lon is not None:
-            # Convert radius from km to meters
-            radius_meters = radius * 1000
+            # Approximate bounding box (rough estimate for small radius)
+            lat_delta = radius / 111.0  # ~111 km per degree latitude
+            lon_delta = radius / (111.0 * abs(math.cos(math.radians(lat))) if lat else 111.0)
             query = query.filter(
-                text(
-                    "ST_DWithin(location, ST_MakePoint(:lon, :lat)::geography, :radius)"
-                )
-            ).params(lon=lon, lat=lat, radius=radius_meters)
+                ConflictEvent.latitude >= lat - lat_delta,
+                ConflictEvent.latitude <= lat + lat_delta,
+                ConflictEvent.longitude >= lon - lon_delta,
+                ConflictEvent.longitude <= lon + lon_delta,
+            )
         
         # Severity filter
         if severity is not None:
@@ -65,7 +68,7 @@ async def list_events(
         # Pagination
         events = query.offset(skip).limit(limit).all()
         
-        # Manually serialize events (PostGIS geometry needs special handling)
+        # Serialize events (simple float columns now)
         serialized_events = []
         for event in events:
             event_dict = {
@@ -81,25 +84,9 @@ async def list_events(
                 "region_name": event.region_name,
                 "is_active": event.is_active,
                 "conflict_id": event.conflict_id,
-                # Extract lat/lon from PostGIS geometry
-                "latitude": None,
-                "longitude": None
+                "latitude": event.latitude,
+                "longitude": event.longitude
             }
-            
-            # Convert PostGIS geometry to lat/lon
-            if event.location:
-                try:
-                    # Query to extract coordinates
-                    result = db.execute(
-                        text("SELECT ST_Y(location), ST_X(location) FROM conflict_events WHERE id = :id"),
-                        {"id": event.id}
-                    ).first()
-                    if result:
-                        event_dict["latitude"] = result[0]
-                        event_dict["longitude"] = result[1]
-                except Exception:
-                    pass
-            
             serialized_events.append(event_dict)
         
         return {

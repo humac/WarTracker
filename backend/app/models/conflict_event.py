@@ -1,5 +1,4 @@
 from sqlalchemy import Column, BigInteger, String, Text, Integer, Float, Boolean, DateTime, CheckConstraint, ForeignKey, JSON
-from geoalchemy2 import Geometry
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from ..database import Base
@@ -9,8 +8,10 @@ class ConflictEvent(Base):
     __tablename__ = "conflict_events"
     
     id = Column(BigInteger, primary_key=True, index=True)
-    location = Column(Geometry('POINT', srid=4326), nullable=False)
-    location_display = Column(Geometry('POINT', srid=4326))  # Blurred for safety
+    latitude = Column(Float, nullable=False, index=True)
+    longitude = Column(Float, nullable=False, index=True)
+    latitude_display = Column(Float)  # Blurred for safety
+    longitude_display = Column(Float)  # Blurred for safety
     event_type = Column(String(50), nullable=False, index=True)
     title = Column(String(500), nullable=False)
     description = Column(Text)

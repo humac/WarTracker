@@ -10,8 +10,7 @@ import httpx
 import asyncio
 from typing import List, Dict, Any
 from datetime import datetime, timedelta, timezone
-from geoalchemy2.shape import from_shape
-from shapely.geometry import Point
+
 from .base import BaseCollector
 
 
@@ -183,15 +182,12 @@ class GDELTCollector(BaseCollector):
         # Estimate severity based on event type
         severity = self._estimate_severity(event_type)
         
-        # Create PostGIS geometry object using GeoAlchemy2 + Shapely
-        # Note: We'll convert this to WKT in the script for insertion
-        location_wkt = f"POINT({longitude} {latitude})"
-        
         return {
             "title": article.get("title", "Untitled Event"),
             "description": article.get("snippet", ""),
             "event_timestamp": event_date,
-            "location": location_wkt,  # WKT format - will be converted to geometry on insert
+            "latitude": latitude,
+            "longitude": longitude,
             "severity_score": severity,
             "event_type": event_type,
             "actors_involved": [],
