@@ -51,10 +51,7 @@ export function ConflictMap({ events, className, height = DEFAULT_HEIGHT, initia
       try {
         // Dynamic imports for browser-only libraries
         const L = await import('leaflet')
-        await import('leaflet/dist/leaflet.css')
         await import('leaflet.markercluster')
-        await import('leaflet.markercluster/dist/MarkerCluster.css')
-        await import('leaflet.markercluster/dist/MarkerCluster.Default.css')
 
         if (!mapRef.current) return
 
