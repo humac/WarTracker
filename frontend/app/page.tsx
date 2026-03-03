@@ -23,7 +23,7 @@ interface ConflictEvent {
   longitude: number
   severity: number
   published_date: string
-  country_code?: string
+  country_code: string
 }
 
 type Tab = 'map' | 'timeline' | 'alerts'
@@ -79,7 +79,7 @@ export default function Home() {
           longitude: e.longitude || 0,
           severity: e.severity_score || 1,
           published_date: e.event_timestamp ? new Date(e.event_timestamp).toISOString().split('T')[0] : 'Unknown',
-          country_code: e.country_code || undefined,
+          country_code: e.country_code || '',
         }))
         setEvents(apiEvents)
       } catch (err) {
