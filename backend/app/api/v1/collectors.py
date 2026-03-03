@@ -114,4 +114,8 @@ async def trigger_gdelt_collection(background_tasks: BackgroundTasks, db: Sessio
     
     except Exception as e:
         logger.error(f"Unexpected error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        return {
+            "status": "error",
+            "message": f"Collection failed: {str(e)[:100]}",
+            "count": 0
+        }
