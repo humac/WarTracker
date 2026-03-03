@@ -57,8 +57,15 @@ export function ConflictMap({ events, className, height = DEFAULT_HEIGHT, initia
         }).addTo(map)
 
         // Add markers (no clustering for now - compatibility fix)
+        let markersAdded = 0
+        let skipped = 0
+        
         events.forEach((event) => {
-          if (event.latitude && event.longitude) {
+          // Check for valid coordinates (not 0,0 and not null/undefined)
+          const isValidLat = typeof event.latitude === 'number' && event.latitude !== 0 && !isNaN(event.latitude)
+          const isValidLon = typeof event.longitude === 'number' && event.longitude !== 0 && !isNaN(event.longitude)
+          
+          if (isValidLat && isValidLon) {
             const color = getSeverityColor(event.severity_score)
             const markerIcon = L.divIcon({
               html: `<div style="background:${color};width:14px;height:14px;border-radius:50%;border:2px solid white;box-shadow:0 1px 3px rgba(0,0,0,.4)"></div>`,
@@ -71,11 +78,17 @@ export function ConflictMap({ events, className, height = DEFAULT_HEIGHT, initia
             marker.bindPopup(`
               <strong>${event.title}</strong><br/>
               Severity: ${event.severity_score}<br/>
-              Date: ${event.event_timestamp}
+              Date: ${new Date(event.event_timestamp).toLocaleDateString()}<br/>
+              <small>${event.country_code || 'Unknown'}</small>
             `)
             marker.addTo(map)
+            markersAdded++
+          } else {
+            skipped++
           }
         })
+        
+        console.log(`Map: Added ${markersAdded} markers, Skipped ${skipped} events with invalid coordinates`)
 
         setIsLoaded(true)
       } catch (err) {
