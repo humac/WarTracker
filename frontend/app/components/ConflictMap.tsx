@@ -137,7 +137,7 @@ export function ConflictMap({ events, className, height = DEFAULT_HEIGHT, initia
       <div 
         ref={mapRef} 
         className={`rounded-lg overflow-hidden ${!isLoaded ? 'invisible' : ''}`}
-        style={{ height }}
+        style={{ height, minHeight: '400px', width: '100%' }}
         aria-label="Interactive map showing conflict events worldwide"
         role="application"
       />
