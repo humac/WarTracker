@@ -9,6 +9,7 @@ interface ConflictEvent {
   longitude: number
   severity_score: number
   event_timestamp: string
+  country_code?: string
 }
 
 interface ConflictMapProps {
