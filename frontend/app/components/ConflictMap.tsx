@@ -293,7 +293,7 @@ export function ConflictMap({
         </svg>
         <p className="text-red-800 dark:text-red-200 font-medium">{error}</p>
         <button
-          onClick={() => window.location.reload()}
+          onClick={() => { if (typeof window !== 'undefined') window.location.reload() }}
           className="mt-4 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
           aria-label="Refresh page"
         >

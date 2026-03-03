@@ -44,9 +44,11 @@ export default function Home() {
       })
       const data = await response.json()
       setFetchResult(data)
-      // Refresh events list after a short delay
+      // Refresh events list after a short delay (client-side only)
       setTimeout(() => {
-        window.location.reload()
+        if (typeof window !== 'undefined') {
+          window.location.reload()
+        }
       }, 1500)
     } catch (error) {
       setFetchResult({ status: 'error', count: 0 })
