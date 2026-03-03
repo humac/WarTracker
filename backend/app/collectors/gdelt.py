@@ -54,14 +54,16 @@ class GDELTCollector(BaseCollector):
         "insurgency"
     ]
     
-    def __init__(self, max_records: int = 100):
+    def __init__(self, max_records: int = 100, timeout: float = 30.0):
         """
         Initialize GDELT collector.
         
         Args:
             max_records: Maximum number of records to fetch per query
+            timeout: Request timeout in seconds (default: 30.0)
         """
         self.max_records = max_records
+        self.timeout = timeout  # Store timeout
     
     async def fetch(self) -> List[Dict[str, Any]]:
         """
@@ -77,8 +79,11 @@ class GDELTCollector(BaseCollector):
             "User-Agent": "WarTracker/1.0 (Conflict Tracking Platform)"
         }
         
-        # Use longer timeout and retry logic for GDELT
-        async with httpx.AsyncClient(headers=headers, timeout=60.0) as client:
+        # Use configured timeout
+        async with httpx.AsyncClient(
+            headers=headers,
+            timeout=httpx.Timeout(self.timeout, connect=10.0, read=20.0)
+        ) as client:
             # Fetch recent conflict news (last 24 hours)
             # GDELT requires parentheses around OR'd terms
             query = "(" + " OR ".join(self.CONFLICT_QUERIES) + ")"

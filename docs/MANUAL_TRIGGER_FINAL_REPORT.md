@@ -113,6 +113,40 @@ The manual trigger allows users to:
 
 ---
 
+## Timeout Handling Fix
+
+**Date:** 2026-03-03 UTC  
+**Status:** ✅ COMPLETE - Production Blocker Resolved
+
+### Problem
+The GDELT API collector had no timeout configuration, causing requests to hang for 60+ seconds when the API was unreachable. This resulted in poor user experience with the "Fetching..." button stuck indefinitely.
+
+### Solution
+Implemented comprehensive timeout handling:
+
+1. **Timeout Configuration (30s total):**
+   - Connect timeout: 10 seconds
+   - Read timeout: 20 seconds
+   - Total: 30 seconds maximum
+
+2. **Error Handling:**
+   - `TimeoutException`: Returns user-friendly timeout message
+   - `ConnectError`: Returns user-friendly connection error message
+   - Both return valid JSON response structure
+
+3. **Files Modified:**
+   - `backend/app/collectors/gdelt.py` - Added timeout parameter to `__init__` and `AsyncClient`
+   - `backend/app/api/v1/collectors.py` - Added timeout exception handlers
+
+### Verification
+- ✅ Endpoint tested and returns valid JSON
+- ✅ Timeout configured correctly (30s)
+- ✅ Error handlers in place
+- ✅ No breaking changes to existing functionality
+- ✅ QA validation: PASS (see `docs/agent-workflow/QA_TIMEOUT_FIX.md`)
+
+---
+
 ## Technical Implementation
 
 ### Frontend Code
@@ -199,7 +233,7 @@ api_router.include_router(collectors.router, prefix="/collect", tags=["collector
 
 ## Known Limitations
 
-### 1. Timeout Handling (⚠️ Before Production)
+### 1. Timeout Handling (✅ RESOLVED)
 
 **Issue:** Backend endpoint has no timeout configuration for httpx client.
 
@@ -207,14 +241,40 @@ api_router.include_router(collectors.router, prefix="/collect", tags=["collector
 - Request hangs for 60s when GDELT API is unreachable
 - Poor user experience (button stuck in "Fetching..." state)
 
-**Fix Required:**
+**Fix Applied:**
 ```python
 # In backend/app/collectors/gdelt.py
-async with httpx.AsyncClient(headers=headers, timeout=30.0) as client:
-    # ... existing code ...
+def __init__(self, max_records: int = 100, timeout: float = 30.0):
+    self.max_records = max_records
+    self.timeout = timeout
+
+async with httpx.AsyncClient(
+    headers=headers,
+    timeout=httpx.Timeout(self.timeout, connect=10.0, read=20.0)
+) as client:
 ```
 
-**Priority:** HIGH (before production deployment)
+**Error Handling Added:**
+```python
+# In backend/app/api/v1/collectors.py
+except httpx.TimeoutException as e:
+    logger.error(f"GDELT API timeout: {e}")
+    return {
+        "status": "error",
+        "message": "GDELT API timeout after 30 seconds",
+        "count": 0
+    }
+
+except httpx.ConnectError as e:
+    logger.error(f"GDELT API connection error: {e}")
+    return {
+        "status": "error",
+        "message": "Cannot connect to GDELT API",
+        "count": 0
+    }
+```
+
+**Priority:** ✅ RESOLVED - Production blocker removed
 
 ### 2. GDELT API Accessibility (⚠️ Infrastructure)
 

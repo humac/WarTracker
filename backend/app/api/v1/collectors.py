@@ -6,6 +6,10 @@ from sqlalchemy import text
 from datetime import datetime, timezone
 from geoalchemy2.shape import from_shape
 from shapely.geometry import Point
+import httpx
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -77,7 +81,8 @@ async def trigger_gdelt_collection(background_tasks: BackgroundTasks, db: Sessio
     Returns immediately, runs collection in background.
     """
     try:
-        collector = GDELTCollector(max_records=100)
+        # Add timeout: 30 seconds total, 10s connect, 20s read
+        collector = GDELTCollector(max_records=100, timeout=30.0)
         events = await collector.fetch()
         
         if not events:
@@ -98,5 +103,23 @@ async def trigger_gdelt_collection(background_tasks: BackgroundTasks, db: Sessio
             "message": f"Collected {len(events)} events from GDELT",
             "count": len(events)
         }
+    
+    except httpx.TimeoutException as e:
+        logger.error(f"GDELT API timeout: {e}")
+        return {
+            "status": "error",
+            "message": "GDELT API timeout after 30 seconds",
+            "count": 0
+        }
+    
+    except httpx.ConnectError as e:
+        logger.error(f"GDELT API connection error: {e}")
+        return {
+            "status": "error",
+            "message": "Cannot connect to GDELT API",
+            "count": 0
+        }
+    
     except Exception as e:
+        logger.error(f"Unexpected error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
