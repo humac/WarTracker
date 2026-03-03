@@ -28,7 +28,6 @@ interface ConflictEvent {
 
 type Tab = 'map' | 'timeline' | 'alerts'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true)
@@ -42,7 +41,7 @@ export default function Home() {
     setIsFetching(true)
     setFetchResult(null)
     try {
-      const response = await fetch(`${API_URL}/api/v1/collect/gdelt`, {
+      const response = await fetch('/api/v1/collect/gdelt', {
         method: 'POST',
       })
       const data = await response.json()
