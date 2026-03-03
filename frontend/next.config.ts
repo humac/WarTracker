@@ -14,6 +14,9 @@ const nextConfig: NextConfig = {
   },
   // Disable strict mode for development
   reactStrictMode: false,
+  // Force all pages to be dynamically rendered (no static generation)
+  // This is needed because we use browser APIs like window.location
+  output: 'standalone',
 };
 
 export default nextConfig;

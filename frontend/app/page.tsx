@@ -1,6 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+// Force dynamic rendering - this page requires browser APIs
+export const dynamic = 'force-dynamic'
+export const ssr = true
 import { ConflictMap } from './components/ConflictMap'
 import { Timeline } from './components/Timeline'
 import { Alerts } from './components/Alerts'
