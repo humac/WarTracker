@@ -21,8 +21,8 @@ interface ConflictEvent {
   title: string
   latitude: number
   longitude: number
-  severity_score: number
-  event_timestamp: string
+  severity: number
+  published_date: string
   country_code?: string
 }
 
@@ -77,8 +77,8 @@ export default function Home() {
           title: e.title,
           latitude: e.latitude || 0,
           longitude: e.longitude || 0,
-          severity_score: e.severity_score || 1,
-          event_timestamp: e.event_timestamp || new Date().toISOString(),
+          severity: e.severity_score || 1,
+          published_date: e.event_timestamp ? new Date(e.event_timestamp).toISOString().split('T')[0] : 'Unknown',
           country_code: e.country_code || undefined,
         }))
         setEvents(apiEvents)
@@ -230,7 +230,7 @@ export default function Home() {
                   <span className="text-2xl">🔴</span>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{events.filter(e => e.severity_score >= 4).length}</div>
+                  <div className="text-2xl font-bold">{events.filter(e => e.severity >= 4).length}</div>
                   <p className="text-xs text-muted-foreground">Severity 4-5</p>
                 </CardContent>
               </Card>
