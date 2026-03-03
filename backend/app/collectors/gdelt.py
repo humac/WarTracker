@@ -39,27 +39,27 @@ class GDELTCollector(BaseCollector):
     # GDELT 2.0 API endpoints
     BASE_URL = "https://api.gdeltproject.org/api/v2/doc/doc"
     
-    # Search queries for conflict-related events
+    # Search queries for conflict-related events (more specific for better results)
     CONFLICT_QUERIES = [
-        "conflict",
         "war",
-        "violence",
-        "protest",
-        "riot",
-        "battle",
-        "military",
-        "armed",
-        "crisis",
-        "insurgency"
+        "bombing",
+        "airstrike",
+        "missile attack",
+        "military offensive",
+        "armed conflict",
+        "ceasefire violation",
+        "shelling",
+        "artillery fire",
+        "insurgent attack"
     ]
     
-    def __init__(self, max_records: int = 100, timeout: float = 30.0):
+    def __init__(self, max_records: int = 250, timeout: float = 60.0):
         """
         Initialize GDELT collector.
         
         Args:
             max_records: Maximum number of records to fetch per query
-            timeout: Request timeout in seconds (default: 30.0)
+            timeout: Request timeout in seconds (default: 60.0)
         """
         self.max_records = max_records
         self.timeout = timeout  # Store timeout
@@ -81,7 +81,7 @@ class GDELTCollector(BaseCollector):
         # Use configured timeout
         async with httpx.AsyncClient(
             headers=headers,
-            timeout=httpx.Timeout(self.timeout, connect=10.0, read=20.0)
+            timeout=httpx.Timeout(self.timeout, connect=15.0, read=45.0)
         ) as client:
             # Fetch recent conflict news (last 24 hours)
             # GDELT requires parentheses around OR'd terms
