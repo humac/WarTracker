@@ -43,6 +43,10 @@ export default function Home() {
     try {
       const response = await fetch('/api/v1/collect/gdelt', {
         method: 'POST',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache',
+        },
       })
       const data = await response.json()
       setFetchResult(data)
