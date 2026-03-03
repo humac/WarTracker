@@ -27,6 +27,7 @@ class Settings(BaseSettings):
         "http://localhost:3000",
         "https://wartracker.org",
         "https://www.wartracker.org",
+        "https://frontend-production-06de.up.railway.app",
     ]
     
     # Rate Limiting
