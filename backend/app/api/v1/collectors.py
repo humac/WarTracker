@@ -4,8 +4,6 @@ from app.database import get_db
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from datetime import datetime, timezone
-from geoalchemy2.shape import from_shape
-from shapely.geometry import Point
 import httpx
 import logging
 
@@ -29,26 +27,19 @@ async def save_events_to_db(events: list, db: Session):
         if existing:
             continue  # Skip duplicates
         
-        # Parse WKT location to lat/lon for storage
-        location_wkt = event.get("location", "POINT(0 0)")
-        try:
-            # Extract coordinates from WKT
-            coords = location_wkt.replace("POINT(", "").replace(")", "").split()
-            longitude = float(coords[0])
-            latitude = float(coords[1])
-        except (ValueError, IndexError):
-            longitude, latitude = 0.0, 0.0
-        
-        # Insert event using ST_GeomFromText for PostGIS
+        latitude = event.get("latitude", 0.0)
+        longitude = event.get("longitude", 0.0)
+
+        # Insert event using float lat/lon columns
         db.execute(
             text("""
                 INSERT INTO conflict_events (
-                    title, description, event_timestamp, location,
+                    title, description, event_timestamp, latitude, longitude,
                     severity_score, event_type, country_code, region_name,
                     verification_status, confidence_score, is_active,
                     conflict_id
                 ) VALUES (
-                    :title, :description, :event_timestamp, ST_GeomFromText(:location_wkt, 4326),
+                    :title, :description, :event_timestamp, :latitude, :longitude,
                     :severity_score, :event_type, :country_code, :region_name,
                     :verification_status, :confidence_score, :is_active,
                     :conflict_id
@@ -58,7 +49,8 @@ async def save_events_to_db(events: list, db: Session):
                 "title": event.get("title", "Untitled Event"),
                 "description": event.get("description", ""),
                 "event_timestamp": event.get("event_timestamp", datetime.now(timezone.utc)),
-                "location_wkt": location_wkt,
+                "latitude": latitude,
+                "longitude": longitude,
                 "severity_score": event.get("severity_score", 2),
                 "event_type": event.get("event_type", "other"),
                 "country_code": event.get("country_code"),
