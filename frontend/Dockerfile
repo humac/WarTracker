@@ -20,5 +20,8 @@ RUN rm -f .env
 # Expose port
 EXPOSE 3000
 
+# Build and start production server
+RUN npm run build
+
 # Default command (overridden in docker-compose)
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start"]
