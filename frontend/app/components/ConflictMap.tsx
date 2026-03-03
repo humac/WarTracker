@@ -7,8 +7,8 @@ interface ConflictEvent {
   title: string
   latitude: number
   longitude: number
-  severity: number
-  published_date: string
+  severity_score: number
+  event_timestamp: string
 }
 
 interface ConflictMapProps {
@@ -59,7 +59,7 @@ export function ConflictMap({ events, className, height = DEFAULT_HEIGHT, initia
         // Add markers (no clustering for now - compatibility fix)
         events.forEach((event) => {
           if (event.latitude && event.longitude) {
-            const color = getSeverityColor(event.severity)
+            const color = getSeverityColor(event.severity_score)
             const markerIcon = L.divIcon({
               html: `<div style="background:${color};width:14px;height:14px;border-radius:50%;border:2px solid white;box-shadow:0 1px 3px rgba(0,0,0,.4)"></div>`,
               className: 'wartracker-marker',
@@ -70,8 +70,8 @@ export function ConflictMap({ events, className, height = DEFAULT_HEIGHT, initia
             const marker = L.marker([event.latitude, event.longitude], { icon: markerIcon })
             marker.bindPopup(`
               <strong>${event.title}</strong><br/>
-              Severity: ${event.severity}<br/>
-              Date: ${event.published_date}
+              Severity: ${event.severity_score}<br/>
+              Date: ${event.event_timestamp}
             `)
             marker.addTo(map)
           }
