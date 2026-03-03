@@ -56,7 +56,7 @@ export function ConflictMap({ events, className, height = DEFAULT_HEIGHT, initia
         if (!mapRef.current) return
 
         // Initialize map
-        map = L.map(mapRef.current).setCenter(initialCenter, initialZoom)
+        map = L.map(mapRef.current).setView(initialCenter, initialZoom)
 
         // Add tile layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
