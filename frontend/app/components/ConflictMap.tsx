@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 interface ConflictEvent {
   id: number
@@ -30,12 +30,6 @@ const getSeverityColor = (severity: number): string => {
   return '#22c55e'
 }
 
-const getClusterColor = (count: number): string => {
-  if (count >= 100) return '#dc2626'
-  if (count >= 50) return '#f59e0b'
-  if (count >= 10) return '#eab308'
-  return '#22c55e'
-}
 
 export function ConflictMap({ events, className, height = DEFAULT_HEIGHT, initialZoom = DEFAULT_ZOOM, initialCenter = DEFAULT_CENTER }: ConflictMapProps) {
   const mapRef = useRef<HTMLDivElement>(null)
@@ -45,13 +39,11 @@ export function ConflictMap({ events, className, height = DEFAULT_HEIGHT, initia
   useEffect(() => {
     // Only load leaflet on client side
     let map: any = null
-    let markerClusterGroup: any = null
 
     const initMap = async () => {
       try {
         // Dynamic imports for browser-only libraries
         const L = await import('leaflet')
-        await import('leaflet.markercluster')
 
         if (!mapRef.current) return
 
@@ -64,23 +56,27 @@ export function ConflictMap({ events, className, height = DEFAULT_HEIGHT, initia
           maxZoom: 18,
         }).addTo(map)
 
-        // Create marker cluster group
-        markerClusterGroup = L.markerClusterGroup()
-
-        // Add markers
+        // Add markers (no clustering for now - compatibility fix)
         events.forEach((event) => {
           if (event.latitude && event.longitude) {
-            const marker = L.marker([event.latitude, event.longitude])
+            const color = getSeverityColor(event.severity)
+            const markerIcon = L.divIcon({
+              html: `<div style="background:${color};width:14px;height:14px;border-radius:50%;border:2px solid white;box-shadow:0 1px 3px rgba(0,0,0,.4)"></div>`,
+              className: 'wartracker-marker',
+              iconSize: [14, 14],
+              iconAnchor: [7, 7],
+            })
+
+            const marker = L.marker([event.latitude, event.longitude], { icon: markerIcon })
             marker.bindPopup(`
               <strong>${event.title}</strong><br/>
               Severity: ${event.severity}<br/>
               Date: ${event.published_date}
             `)
-            markerClusterGroup.addLayer(marker)
+            marker.addTo(map)
           }
         })
 
-        map.addLayer(markerClusterGroup)
         setIsLoaded(true)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load map')
