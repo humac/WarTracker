@@ -2,7 +2,7 @@
 
 **Last Updated:** 2026-03-09T16:10:00Z  
 **Current Phase:** ⏸️ IDLE / NOTHING RUNNING  
-**Owner:** None - no active subagents  
+**Owner:** None - no running subagents  
 **Status:** Historical work is complete, but the project still needs stabilization follow-up for deployment/data/map behavior.
 
 ---
