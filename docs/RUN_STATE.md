@@ -1,7 +1,7 @@
 # WarTracker - Run State
 
 **Last Updated:** 2026-03-09T16:10:00Z  
-**Current Phase:** ⏸️ IDLE / NO ACTIVE WORK  
+**Current Phase:** ⏸️ IDLE / NOTHING RUNNING  
 **Owner:** None - no active subagents  
 **Status:** Historical work is complete, but the project still needs stabilization follow-up for deployment/data/map behavior.
 
