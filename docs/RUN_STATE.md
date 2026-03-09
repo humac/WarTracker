@@ -6,7 +6,7 @@
 **Status:** Historical work is complete, but the project still needs stabilization follow-up for deployment/data/map behavior.
 
 ---
-## Pipeline Status
+## Historical Status
 
 | Phase | Agent | Status | Session | Timestamp |
 |-------|-------|--------|---------|-----------|
@@ -82,7 +82,7 @@ All phases completed successfully:
 
 **Phase:** heimdall_qa_map_fix_v2  
 **Agent:** Heimdall (Subagent)  
-**Status:** ✅ PASS  
+**Status:** Historical record: ✅ PASS  
 **Session:** 65422969-9a7b-4cf6-8d44-4a4491ef14bb
 
 ### QA Results
@@ -102,7 +102,7 @@ All phases completed successfully:
 
 **Phase:** pepper_closeout_map_fix_v2  
 **Agent:** Pepper (Subagent)  
-**Status:** ✅ COMPLETE  
+**Status:** Historical record: ✅ COMPLETE  
 **Session:** 4f17e44c-b4b8-4cc3-b02b-108314f5ae64
 
 ### Closeout Deliverables
@@ -129,7 +129,7 @@ All phases completed successfully:
 
 **Phase:** tony_ui_redesign_shadcn  
 **Agent:** Tony (Architect)  
-**Status:** ✅ COMPLETE  
+**Status:** Historical record: ✅ COMPLETE  
 **Session:** d9cdae93-4373-49fc-b839-cd9233f48ec9
 
 **Deliverables:**
@@ -142,7 +142,7 @@ All phases completed successfully:
 
 **Phase:** peter_build_ui_shadcn  
 **Agent:** Peter (Developer)  
-**Status:** ✅ COMPLETE  
+**Status:** Historical record: ✅ COMPLETE  
 **Session:** 0272d01e-db0e-4136-a2f4-c510df78b0f6
 
 **Deliverables:**
@@ -157,7 +157,7 @@ All phases completed successfully:
 
 **Phase:** heimdall_qa_ui_shadcn  
 **Agent:** Heimdall (QA)  
-**Status:** ✅ PASS  
+**Status:** Historical record: ✅ PASS  
 **Session:** d1681891-a769-4e3c-80d5-191aa7248368
 
 **QA Results:**
@@ -172,7 +172,7 @@ All phases completed successfully:
 
 **Phase:** pepper_closeout_ui_shadcn  
 **Agent:** Pepper (Analyst)  
-**Status:** ✅ COMPLETE  
+**Status:** Historical record: ✅ COMPLETE  
 **Session:** d68ca22a-9a28-4f75-bba5-76cc8e356f8d
 
 **Closeout Deliverables:**
