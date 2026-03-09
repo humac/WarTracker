@@ -1,10 +1,11 @@
 # WarTracker - Run State
 
-**Last Updated:** 2026-03-02 20:50 UTC  
-**Current Phase:** pepper_closeout_ui_shadcn ✅ COMPLETE
+**Last Updated:** 2026-03-09T14:13:00Z  
+**Current Phase:** ⏸️ IDLE / NO ACTIVE WORK  
+**Owner:** None - no active subagents  
+**Status:** All recorded work is historical; nothing is currently in progress.
 
 ---
-
 ## Pipeline Status
 
 | Phase | Agent | Status | Session | Timestamp |
