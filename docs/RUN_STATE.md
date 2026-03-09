@@ -1,9 +1,9 @@
 # WarTracker - Run State
 
-**Last Updated:** 2026-03-09T14:13:00Z  
+**Last Updated:** 2026-03-09T16:10:00Z  
 **Current Phase:** ⏸️ IDLE / NO ACTIVE WORK  
 **Owner:** None - no active subagents  
-**Status:** All recorded work is historical; nothing is currently in progress.
+**Status:** Historical work is complete, but the project still needs stabilization follow-up for deployment/data/map behavior.
 
 ---
 ## Pipeline Status
@@ -27,6 +27,12 @@
 | **pepper_closeout_timeout_fix** | **Pepper** | **✅ COMPLETE** | **bb551b9e-079a-4594-ae8f-92a6e90c9fcb** | **2026-03-03 01:09 UTC** |
 
 ---
+
+## Current Reality
+
+**Project State:** ⚠️ Functional but still needs stabilization
+
+The historical pipeline entries below are valid, but they overstate finality relative to the actual production cleanup that followed. Treat WarTracker as a maintained project that still needs a structured stabilization pass.
 
 ## Pipeline COMPLETE
 
