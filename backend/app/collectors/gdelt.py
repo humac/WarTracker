@@ -36,30 +36,34 @@ class GDELTCollector(BaseCollector):
     description = "GDELT Project - Global event database (free)"
     requires_api_key = False
     
-    # GDELT 2.0 API endpoints
-    BASE_URL = "https://api.gdeltproject.org/api/v2/doc/doc"
+    # GDELT 2.0 API endpoints - using GKG for more recent events
+    BASE_URL = "https://api.gdeltproject.org/api/v2/gkg/gkg"
     
-    # Search queries for conflict-related events (more specific for better results)
+    # Search queries for conflict-related events (broader to catch more recent news)
     CONFLICT_QUERIES = [
         "war",
         "bombing",
         "airstrike",
-        "missile attack",
-        "military offensive",
+        "missile",
+        "military",
         "armed conflict",
-        "ceasefire violation",
         "shelling",
-        "artillery fire",
-        "insurgent attack"
+        "artillery",
+        "insurgent",
+        "ceasefire",
+        "invasion",
+        "occupation",
+        "refugee",
+        "evacuation"
     ]
     
-    def __init__(self, max_records: int = 250, timeout: float = 60.0):
+    def __init__(self, max_records: int = 500, timeout: float = 90.0):
         """
         Initialize GDELT collector.
         
         Args:
             max_records: Maximum number of records to fetch per query
-            timeout: Request timeout in seconds (default: 60.0)
+            timeout: Request timeout in seconds (default: 90.0)
         """
         self.max_records = max_records
         self.timeout = timeout  # Store timeout
@@ -81,7 +85,7 @@ class GDELTCollector(BaseCollector):
         # Use configured timeout
         async with httpx.AsyncClient(
             headers=headers,
-            timeout=httpx.Timeout(self.timeout, connect=15.0, read=45.0)
+            timeout=httpx.Timeout(self.timeout, connect=20.0, read=70.0)
         ) as client:
             # Fetch recent conflict news (last 24 hours)
             # GDELT requires parentheses around OR'd terms
@@ -92,7 +96,8 @@ class GDELTCollector(BaseCollector):
                 "format": "json",
                 "maxrecords": str(self.max_records),
                 "sort": "Date",
-                "lang": "english"
+                "lang": "all",
+                "timespan": "14"  # Last 14 days instead of default
             }
             
             try:
