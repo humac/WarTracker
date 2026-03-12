@@ -24,6 +24,7 @@ These files are meant to act like lightweight Figma-style review artifacts using
 - verification shown before severity in most list/detail contexts
 - persistent right-rail detail model on desktop
 - calm analytical tone rather than sensational news styling
+- map views use a more realistic static cartography pass: geopolitical region labels, dashed analyst focus areas, density/heat treatment, corridor overlays, scale treatment, and map-control framing so the product direction reads as conflict intelligence rather than generic dashboard art
 
 ## Screenshot outputs
 Screenshot PNGs are exported into this same folder with names like:
